@@ -2,6 +2,7 @@
 #include <cstring>
 
 #include "State.h"
+#include "main.h"
 
 int main(int argc, char* argv[]) {
 
@@ -9,9 +10,10 @@ int main(int argc, char* argv[]) {
     states.white = new WhiteSpaceState();
     states.identifier = new IdentifierState();
     states.number = new NumberState();
+    states.operatr = new OperatorState();
 
     State* currentState = states.white;
-    char buffer[32] = {'\0'};
+    char buffer[BUFSIZE] = {'\0'};
     char value;
 
     FILE* info_file;

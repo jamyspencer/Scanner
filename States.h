@@ -12,7 +12,7 @@ public:
     State* white;
     State* identifier;
     State* number;
-//    State* operators = new OperatorState();
+    State* operatr;
 };
 #include "State.h"
 
