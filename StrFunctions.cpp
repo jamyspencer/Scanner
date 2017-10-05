@@ -5,7 +5,7 @@
 #include "StrFunctions.h"
 
 void appendChar(char *destination, char source){
-    int i = 0, j = 0;
+    int i = 0;
     while (destination[i] != '\0') {
         i++;
     }
