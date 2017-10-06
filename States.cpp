@@ -15,240 +15,305 @@
 *
 **************************************************************************************/
 
-
 WhiteSpaceState::WhiteSpaceState() {
-    final = false;
+    isFinal = false;
 
-    driver[ENDOFFILE] = [](char* value, Token* buffer, States** states) {
-        buffer->id = EOF_tkn;
-        strncpy(buffer->name, token_names[EOF_tkn], 12);
-        strncpy(buffer->value, token_names[EOF_tkn], 12);
+    driver[ENDOFFILE] = [](char* value, Token* token, States** states) {
+        token->id = EOF_tkn;
+        strncpy(token->name, token_names[EOF_tkn], 12);
+        strncpy(token->value, token_names[EOF_tkn], 12);
         return (States*) NULL;
     };
-    driver[WHITESPACE] = [](char* value, Token* buffer, States** states) {
+    driver[WHITESPACE] = [](char* value, Token* token, States** states) {
         return states[WHITESPACE];
     };
-    driver[LETTER] = [](char* value, Token* buffer, States** states) {
-        appendChar(buffer->value, *value);
+    driver[LETTER] = [](char* value, Token* token, States** states) {
+        appendChar(token->value, *value);
         return states[IDENTIFIER];
     };
-    driver[DIGIT] = [](char* value, Token* buffer, States** states) {
-        appendChar(buffer->value, *value);
+    driver[DIGIT] = [](char* value, Token* token, States** states) {
+        appendChar(token->value, *value);
         return states[DIGIT];
     };
-    driver[EQUALS] = [](char* value, Token* buffer, States** states) {
-        appendChar(buffer->value, *value);
+    driver[EQUALS] = [](char* value, Token* token, States** states) {
+        appendChar(token->value, *value);
         return states[EQUALS];
     };
-    driver[APPENDABLE_OPERATOR] = [](char* value, Token* buffer, States** states) {
-        appendChar(buffer->value, *value);
+    driver[EXCLAM] = [](char* value, Token* token, States** states) {
+        appendChar(token->value, *value);
+        return states[EXCLAM];
+    };
+    driver[APPENDABLE_OPERATOR] = [](char* value, Token* token, States** states) {
+        appendChar(token->value, *value);
         return states[APPENDABLE_OPERATOR];
     };
-    driver[FINAL_OPERATOR] = [](char* value, Token* buffer, States** states) {
-        buffer->id = OPERATOR_tkn;
-        strncpy(buffer->name, token_names[OPERATOR_tkn], 12);
-        appendChar(buffer->value, *value);
-        states[WHITESPACE]->final = true;
+    driver[FINAL_OPERATOR] = [](char* value, Token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        appendChar(token->value, *value);
+        states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
 }
-
 
 /**************************************************************************************
 *
 * NumberState functions
 *
 **************************************************************************************/
-
-
 NumberState::NumberState() {
-    final = false;
+    isFinal = false;
 
-    driver[ENDOFFILE] = [](char* value, Token* buffer, States** states) {
-        buffer->id = NUM_tkn;
-        strncpy(buffer->name, token_names[NUM_tkn], 12);
+    driver[ENDOFFILE] = [](char* value, Token* token, States** states) {
+        token->id = NUM_tkn;
+        strncpy(token->name, token_names[NUM_tkn], 12);
         return (States*) NULL;
     };
-    driver[WHITESPACE] = [](char* value, Token* buffer, States** states) {
-        buffer->id = NUM_tkn;
-        strncpy(buffer->name, token_names[NUM_tkn], 12);
-        states[WHITESPACE]->final = true;
+    driver[WHITESPACE] = [](char* value, Token* token, States** states) {
+        token->id = NUM_tkn;
+        strncpy(token->name, token_names[NUM_tkn], 12);
+        states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[LETTER] = [](char* value, Token* buffer, States** states) {
-        buffer->id = NUM_tkn;
-        strncpy(buffer->name, token_names[NUM_tkn], 12);
+    driver[LETTER] = [](char* value, Token* token, States** states) {
+        token->id = NUM_tkn;
+        strncpy(token->name, token_names[NUM_tkn], 12);
         return (States*) NULL;
 
     };
-    driver[DIGIT] = [](char* value, Token* buffer, States** states) {
-        appendChar(buffer->value, *value);
+    driver[DIGIT] = [](char* value, Token* token, States** states) {
+        appendChar(token->value, *value);
         return states[DIGIT];
     };
-    driver[EQUALS] = [](char* value, Token* buffer, States** states) {
-        buffer->id = NUM_tkn;
-        strncpy(buffer->name, token_names[NUM_tkn], 12);
-        return (States*) NULL;
-        ;
-    };
-    driver[APPENDABLE_OPERATOR] = [](char* value, Token* buffer, States** states) {
-        buffer->id = NUM_tkn;
-        strncpy(buffer->name, token_names[NUM_tkn], 12);
+    driver[EQUALS] = [](char* value, Token* token, States** states) {
+        token->id = NUM_tkn;
+        strncpy(token->name, token_names[NUM_tkn], 12);
         return (States*) NULL;
     };
-    driver[FINAL_OPERATOR] = [](char* value, Token* buffer, States** states) {
-        buffer->id = NUM_tkn;
-        strncpy(buffer->name, token_names[NUM_tkn], 12);
+    driver[EXCLAM] = [](char* value, Token* token, States** states) {
+        token->id = NUM_tkn;
+        strncpy(token->name, token_names[NUM_tkn], 12);
+        return (States*) NULL;
+    };
+    driver[APPENDABLE_OPERATOR] = [](char* value, Token* token, States** states) {
+        token->id = NUM_tkn;
+        strncpy(token->name, token_names[NUM_tkn], 12);
+        return (States*) NULL;
+    };
+    driver[FINAL_OPERATOR] = [](char* value, Token* token, States** states) {
+        token->id = NUM_tkn;
+        strncpy(token->name, token_names[NUM_tkn], 12);
         return (States*) NULL;
 
     };
-
-
 }
-
 
 /**************************************************************************************
 *
 * IdentifierState functions
 *
 **************************************************************************************/
-
-
 IdentifierState::IdentifierState() {
-    final = false;
+    isFinal = false;
 
-    driver[ENDOFFILE] = [](char* value, Token* buffer, States** states) {
-        buffer->id = IDENT_tkn;
-        strncpy(buffer->name, token_names[IDENT_tkn], 12);
+    driver[ENDOFFILE] = [](char* value, Token* token, States** states) {
+        token->id = IDENT_tkn;
+        strncpy(token->name, token_names[IDENT_tkn], 12);
         return (States*) NULL;
 
     };
-    driver[WHITESPACE] = [](char* value, Token* buffer, States** states) {
-        buffer->id = IDENT_tkn;
-        strncpy(buffer->name, token_names[IDENT_tkn], 12);
-        states[WHITESPACE]->final = true;
+    driver[WHITESPACE] = [](char* value, Token* token, States** states) {
+        token->id = IDENT_tkn;
+        strncpy(token->name, token_names[IDENT_tkn], 12);
+        states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
 
     };
-    driver[LETTER] = [](char* value, Token* buffer, States** states) {
-        appendChar(buffer->value, *value);
+    driver[LETTER] = [](char* value, Token* token, States** states) {
+        appendChar(token->value, *value);
         return states[IDENTIFIER];
     };
-    driver[DIGIT] = [](char* value, Token* buffer, States** states) {
-        appendChar(buffer->value, *value);
+    driver[DIGIT] = [](char* value, Token* token, States** states) {
+        appendChar(token->value, *value);
         return states[IDENTIFIER];
     };
-    driver[EQUALS] = [](char* value, Token* buffer, States** states) {
-        buffer->id = IDENT_tkn;
-        strncpy(buffer->name, token_names[IDENT_tkn], 12);
+    driver[EQUALS] = [](char* value, Token* token, States** states) {
+        token->id = IDENT_tkn;
+        strncpy(token->name, token_names[IDENT_tkn], 12);
         return (States*) NULL;
 
     };
-    driver[APPENDABLE_OPERATOR] = [](char* value, Token* buffer, States** states) {
-        buffer->id = IDENT_tkn;
-        strncpy(buffer->name, token_names[IDENT_tkn], 12);
+    driver[EXCLAM] = [](char* value, Token* token, States** states) {
+        token->id = IDENT_tkn;
+        strncpy(token->name, token_names[IDENT_tkn], 12);
+        return (States*) NULL;
+    };
+    driver[APPENDABLE_OPERATOR] = [](char* value, Token* token, States** states) {
+        token->id = IDENT_tkn;
+        strncpy(token->name, token_names[IDENT_tkn], 12);
         return (States*) NULL;
 
     };
-    driver[FINAL_OPERATOR] = [](char* value, Token* buffer, States** states) {
-        buffer->id = IDENT_tkn;
-        strncpy(buffer->name, token_names[IDENT_tkn], 12);
+    driver[FINAL_OPERATOR] = [](char* value, Token* token, States** states) {
+        token->id = IDENT_tkn;
+        strncpy(token->name, token_names[IDENT_tkn], 12);
         return (States*) NULL;
 
     };
 }
-
-
 
 /**************************************************************************************
 *
 * OperatorState functions
 *
 **************************************************************************************/
-
-
-
-
 AppendableOperatorState::AppendableOperatorState() {
-    final = false;
+    isFinal = false;
 
-    driver[ENDOFFILE] = [](char* value, Token* buffer, States** states) {
-        buffer->id = OPERATOR_tkn;
-        strncpy(buffer->name, token_names[OPERATOR_tkn], 12);
+    driver[ENDOFFILE] = [](char* value, Token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        return (States*) NULL;
+    };
+    driver[WHITESPACE] = [](char* value, Token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        states[WHITESPACE]->isFinal = true;
+        return states[WHITESPACE];
+    };
+    driver[LETTER] = [](char* value, Token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        return (States*) NULL;
+    };
+    driver[DIGIT] = [](char* value, Token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        return (States*) NULL;
+    };
+    driver[EQUALS] = [](char* value, Token* token, States** states) {
+        appendChar(token->value, *value);
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        states[WHITESPACE]->isFinal = true;
+        return states[WHITESPACE];
+    };
+    driver[EXCLAM] = [](char* value, Token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        return (States*) NULL;
+    };
+    driver[APPENDABLE_OPERATOR] = [](char* value, Token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
         return (States*) NULL;
 
     };
-    driver[WHITESPACE] = [](char* value, Token* buffer, States** states) {
-        buffer->id = OPERATOR_tkn;
-        strncpy(buffer->name, token_names[OPERATOR_tkn], 12);
-        states[WHITESPACE]->final = true;
-        return states[WHITESPACE];
-    };
-    driver[LETTER] = [](char* value, Token* buffer, States** states) {
-        buffer->id = OPERATOR_tkn;
-        strncpy(buffer->name, token_names[OPERATOR_tkn], 12);
+    driver[FINAL_OPERATOR] = [](char* value, Token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
         return (States*) NULL;
-    };
-    driver[DIGIT] = [](char* value, Token* buffer, States** states) {
-        buffer->id = OPERATOR_tkn;
-        strncpy(buffer->name, token_names[OPERATOR_tkn], 12);
-        return states[DIGIT];
-    };
-    driver[EQUALS] = [](char* value, Token* buffer, States** states) {
-        appendChar(buffer->value, *value);
-        buffer->id = OPERATOR_tkn;
-        strncpy(buffer->name, token_names[OPERATOR_tkn], 12);
-        states[WHITESPACE]->final = true;
-        return states[WHITESPACE];
+
     };
 }
 
 
 EqualsOperatorState::EqualsOperatorState() {
-    final = false;
+    isFinal = false;
 
-    driver[ENDOFFILE] = [](char* value, Token* buffer, States** states) {
-        buffer->id = OPERATOR_tkn;
-        strncpy(buffer->name, token_names[OPERATOR_tkn], 12);
+    driver[ENDOFFILE] = [](char* value, Token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
         return states[ENDOFFILE];
     };
-    driver[WHITESPACE] = [](char* value, Token* buffer, States** states) {
-        buffer->id = OPERATOR_tkn;
-        strncpy(buffer->name, token_names[OPERATOR_tkn], 12);
-        states[WHITESPACE]->final = true;
+    driver[WHITESPACE] = [](char* value, Token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[LETTER] = [](char* value, Token* buffer, States** states) {
-        buffer->id = OPERATOR_tkn;
-        strncpy(buffer->name, token_names[OPERATOR_tkn], 12);
-        states[IDENTIFIER]->final = true;
-        return states[IDENTIFIER];
+    driver[LETTER] = [](char* value, Token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        return (States*) NULL;
     };
-    driver[DIGIT] = [](char* value, Token* buffer, States** states) {
-        buffer->id = OPERATOR_tkn;
-        strncpy(buffer->name, token_names[OPERATOR_tkn], 12);
-        states[DIGIT]->final = true;
-        return states[DIGIT];
+    driver[DIGIT] = [](char* value, Token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        return (States*) NULL;
     };
-    driver[EQUALS] = [](char* value, Token* buffer, States** states) {
-        appendChar(buffer->value, *value);
-        buffer->id = OPERATOR_tkn;
-        strncpy(buffer->name, token_names[OPERATOR_tkn], 12);
-        states[WHITESPACE]->final = true;
+    driver[EQUALS] = [](char* value, Token* token, States** states) {
+        appendChar(token->value, *value);
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
+    driver[EXCLAM] = [](char* value, Token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        return (States*) NULL;
+    };
+    driver[APPENDABLE_OPERATOR] = [](char* value, Token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        return (States*) NULL;
 
+    };
+    driver[FINAL_OPERATOR] = [](char* value, Token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        return (States*) NULL;
+
+    };
 }
 
-EndOfFileState::EndOfFileState() {
-    this->final = true;
+ExclamOperatorState::ExclamOperatorState() {
+    isFinal = false;
 
-    driver[ENDOFFILE] = [](char* value, Token* buffer, States** states) {
-        buffer->id = EOF_tkn;
-        strncpy(buffer->name, token_names[EOF_tkn], 12);
-        strncpy(buffer->value, token_names[EOF_tkn], 12);
-        states[ENDOFFILE]->final = true;
-        return states[ENDOFFILE];
+    driver[ENDOFFILE] = [](char* value, Token* token, States** states) {
+        token->id = ERR_tkn;
+        strncpy(token->name, token_names[ERR_tkn], 12);
+        return (States*) NULL;
     };
+    driver[WHITESPACE] = [](char* value, Token* token, States** states) {
+        token->id = ERR_tkn;
+        strncpy(token->name, token_names[ERR_tkn], 12);
+        states[WHITESPACE]->isFinal = true;
+        return states[WHITESPACE];
+    };
+    driver[LETTER] = [](char* value, Token* token, States** states) {
+        token->id = ERR_tkn;
+        strncpy(token->name, token_names[ERR_tkn], 12);
+        return (States*) NULL;
+    };
+    driver[DIGIT] = [](char* value, Token* token, States** states) {
+        token->id = ERR_tkn;
+        strncpy(token->name, token_names[ERR_tkn], 12);
+        return (States*) NULL;
+    };
+    driver[EQUALS] = [](char* value, Token* token, States** states) {
+        appendChar(token->value, *value);
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        states[WHITESPACE]->isFinal = true;
+        return states[WHITESPACE];
+    };
+    driver[EXCLAM] = [](char* value, Token* token, States** states) {
+        token->id = ERR_tkn;
+        strncpy(token->name, token_names[ERR_tkn], 12);
+        return (States*) NULL;
+    };
+    driver[APPENDABLE_OPERATOR] = [](char* value, Token* token, States** states) {
+        token->id = ERR_tkn;
+        strncpy(token->name, token_names[ERR_tkn], 12);
+        return (States*) NULL;
 
+    };
+    driver[FINAL_OPERATOR] = [](char* value, Token* token, States** states) {
+        token->id = ERR_tkn;
+        strncpy(token->name, token_names[ERR_tkn], 12);
+        return (States*) NULL;
+
+    };
 }

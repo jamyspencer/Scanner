@@ -5,9 +5,7 @@
 #include "scanner.h"
 #include "Token.h"
 
-
-
-static States* states[8];
+static States* states[7];
 static States* currentState;
 
 static FILE* info_file;
@@ -23,10 +21,10 @@ struct Token getToken() {
         currentState = states[WHITESPACE];
         currentState = currentState->driver[map[value + 1]](&value, &token, states);
     }else {
-        currentState->final = false;
+        currentState->isFinal = false;
     }
     //primary token generating loop
-    while ( currentState != NULL && !currentState->final ) {
+    while ( currentState != NULL && !currentState->isFinal ) {
         value = fgetc(info_file);
         currentState = currentState->driver[map[value + 1]](&value, &token, states);
     }
@@ -41,11 +39,11 @@ bool openFile(char* file_name){
         printf("ERROR: unable to open file %s\n", file_name);
         return false;
     }
-    states[ENDOFFILE] = (States*) new EndOfFileState();
     states[WHITESPACE] = (States*) new WhiteSpaceState();
     states[IDENTIFIER] = (States*) new IdentifierState();
     states[DIGIT] = (States*) new NumberState ();
     states[EQUALS] = (States*) new EqualsOperatorState();
+    states[EXCLAM] = (States*) new ExclamOperatorState();
     states[APPENDABLE_OPERATOR] = (States*) new AppendableOperatorState();
     currentState = states[WHITESPACE];
     return true;

@@ -50,7 +50,7 @@ const char map[] = {
     ERROR,
     ERROR,
     WHITESPACE,
-    APPENDABLE_OPERATOR,
+    EXCLAM,
     ERROR,
     ERROR,
     ERROR,

@@ -1,6 +1,8 @@
 //
 // Created by jamy on 9/29/17.
 //
+//Notes on Style--
+//
 
 #ifndef SCANNER_STATE_H
 #define SCANNER_STATE_H
@@ -13,39 +15,34 @@
 #define LETTER 2
 #define IDENTIFIER 2
 #define DIGIT 3
-#define APPENDABLE_OPERATOR 4
-#define FINAL_OPERATOR 5
-#define EQUALS 6
+#define EQUALS 4
+#define EXCLAM 5
+#define APPENDABLE_OPERATOR 6
+#define FINAL_OPERATOR 7
+
 
 
 class States {
 public:
-    bool final;
+    bool isFinal;
     typedef States*(*FunctionPointer)(char*, Token*, States**);
-
-    FunctionPointer driver[8];
-
+    FunctionPointer driver[7];
 };
 
 class WhiteSpaceState: public States {
 public:
     WhiteSpaceState();
-
 };
 
 class NumberState: public States {
 public:
     NumberState();
-
-protected:
-
 };
 
 class IdentifierState: public States{
 public:
     IdentifierState();
 };
-
 
 class AppendableOperatorState: public States{
 public:
@@ -57,10 +54,11 @@ public:
     EqualsOperatorState();
 };
 
-class EndOfFileState: public States{
+class ExclamOperatorState: public States{
 public:
-    EndOfFileState();
+    ExclamOperatorState();
 };
+
 
 
 #endif //SCANNER_STATE_H

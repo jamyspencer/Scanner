@@ -9,6 +9,7 @@
 extern char* token_names[8];
 
 enum token_id{
+    ERR_tkn,
     EOF_tkn,
     IDENT_tkn,
     NUM_tkn,
