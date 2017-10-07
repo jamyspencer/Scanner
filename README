@@ -3,7 +3,8 @@ ints that have a seperate driver it has to interact with. I created a 1 dimensio
 to 9 abstract char types. This value is inputted into the current state object which is stored in a one
 dimensional array of seven state objects(The NULL pointer handles the other two cases), these state objects
 are essentially arrays of lamdas, so once the abstrct char representation is inputted into the objects array
-of lamda drivers, the program goes directly to code that makes the correct state change.
+of lamda drivers, the program goes directly to code that makes the correct state change. So it is essentially
+a 2 dimesnional array of things with an int->int map to reduce redundant behavior.
 
 Design thought process:
 Having this much code loaded into memory and instanteously accesible probably creates a large memory use, but

@@ -12,12 +12,13 @@ enum token_id{
     ERR_tkn,
     EOF_tkn,
     IDENT_tkn,
+    KEYWORD_tkn,
     NUM_tkn,
     OPERATOR_tkn
 };
 
 struct Token {
-    char name[12];
+    char name[13];
     token_id id;
     char value[10];
 };
