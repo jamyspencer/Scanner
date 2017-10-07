@@ -119,6 +119,7 @@ IdentifierState::IdentifierState() {
     driver[ENDOFFILE] = [](char* value, Token* token, States** states) {
         token->id = IDENT_tkn;
         strncpy(token->name, token_names[IDENT_tkn], 12);
+        keywordCheck(token);
         return (States*) NULL;
 
     };
@@ -126,6 +127,7 @@ IdentifierState::IdentifierState() {
         token->id = IDENT_tkn;
         strncpy(token->name, token_names[IDENT_tkn], 12);
         states[WHITESPACE]->isFinal = true;
+        keywordCheck(token);
         return states[WHITESPACE];
 
     };
@@ -140,23 +142,26 @@ IdentifierState::IdentifierState() {
     driver[EQUALS] = [](char* value, Token* token, States** states) {
         token->id = IDENT_tkn;
         strncpy(token->name, token_names[IDENT_tkn], 12);
+        keywordCheck(token);
         return (States*) NULL;
 
     };
     driver[EXCLAM] = [](char* value, Token* token, States** states) {
         token->id = IDENT_tkn;
         strncpy(token->name, token_names[IDENT_tkn], 12);
+        keywordCheck(token);
         return (States*) NULL;
     };
     driver[APPENDABLE_OPERATOR] = [](char* value, Token* token, States** states) {
         token->id = IDENT_tkn;
         strncpy(token->name, token_names[IDENT_tkn], 12);
+        keywordCheck(token);
         return (States*) NULL;
-
     };
     driver[FINAL_OPERATOR] = [](char* value, Token* token, States** states) {
         token->id = IDENT_tkn;
         strncpy(token->name, token_names[IDENT_tkn], 12);
+        keywordCheck(token);
         return (States*) NULL;
 
     };

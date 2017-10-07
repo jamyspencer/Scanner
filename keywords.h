@@ -5,8 +5,11 @@
 #ifndef SCANNER_KEYWORDS_H
 #define SCANNER_KEYWORDS_H
 
+#include "Token.h"
+#include <unordered_map>
 
-struct Token* check_identifier();
+#define KEYWORD_COUNT 10
 
+void keywordCheck(Token* token);
 
 #endif //SCANNER_KEYWORDS_H

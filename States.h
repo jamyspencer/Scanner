@@ -8,6 +8,7 @@
 #define SCANNER_STATE_H
 
 #include "Token.h"
+#include "keywords.h"
 
 #define ERROR -2
 #define ENDOFFILE 0
