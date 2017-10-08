@@ -10,4 +10,4 @@ void appendChar(char *destination, char source);
 int equals(const char* word1, const char* word2);
 int equals(const char* word, char letter);
 
-#endif //SCANNER_MYSTRINGFUNCTIONS_H
+#endif

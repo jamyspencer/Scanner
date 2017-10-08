@@ -1,33 +1,28 @@
 //
-// Created by jamy on 9/29/17.
-//
-//Notes on Style--
+// Created by jamy on 10/7/17.
 //
 
-#ifndef SCANNER_STATE_H
-#define SCANNER_STATE_H
+#ifndef FRONTEND_STATES_H
+#define FRONTEND_STATES_H
 
-#include "Token.h"
-#include "keywords.h"
+#include "token.h"
 
-#define ERROR -2
-#define ENDOFFILE 0
-#define WHITESPACE 1
-#define LETTER 2
-#define IDENTIFIER 2
-#define DIGIT 3
-#define EQUALS 4
-#define EXCLAM 5
-#define APPENDABLE_OPERATOR 6
-#define FINAL_OPERATOR 7
-
+#define WHITESPACE 0
+#define LETTER 1
+#define DIGIT 2
+#define EQUALS 3
+#define EXCLAM 4
+#define APPENDABLE_OPERATOR 5
+#define FINAL_OPERATOR 6
+#define ERROR 7
+#define ENDOFFILE 8
 
 
 class States {
 public:
     bool isFinal;
-    typedef States*(*FunctionPointer)(char*, Token*, States**);
-    FunctionPointer driver[7];
+    typedef States*(*FunctionPointer)(char*, token*, States**);
+    FunctionPointer driver[9];
 };
 
 class WhiteSpaceState: public States {
@@ -60,6 +55,4 @@ public:
     ExclamOperatorState();
 };
 
-
-
-#endif //SCANNER_STATE_H
+#endif

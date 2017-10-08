@@ -1,9 +1,9 @@
 //
-// Created by jamy on 10/4/17.
+// Created by jamy on 10/7/17.
 //
 
-#ifndef SCANNER_TOKEN_H
-#define SCANNER_TOKEN_H
+#ifndef FRONTEND_TOKEN_H
+#define FRONTEND_TOKEN_H
 
 
 extern char* token_names[8];
@@ -17,11 +17,9 @@ enum token_id{
     OPERATOR_tkn
 };
 
-struct Token {
+struct token {
     char name[13];
     token_id id;
     char value[10];
 };
-
-
-#endif //SCANNER_TOKEN_H
+#endif

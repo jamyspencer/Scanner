@@ -1,8 +1,8 @@
 //
-// Created by jamy on 10/4/17.
+// Created by jamy on 10/7/17.
 //
 
-#include "Token.h"
+#include "token.h"
 
 char err[] = "ERROR";
 char eof[] = "EOF";
