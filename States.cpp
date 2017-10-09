@@ -18,6 +18,13 @@
 WhiteSpaceState::WhiteSpaceState() {
     isFinal = false;
 
+    driver[ERROR] = [](char* value, struct token* token, States** states) {
+        token->id = ERR_tkn;
+        strncpy(token->name, token_names[ERR_tkn], 12);
+        appendChar(token->value, *value);
+        states[WHITESPACE]->isFinal = true;
+        return states[WHITESPACE];
+    };
     driver[ENDOFFILE] = [](char* value, struct token* token, States** states) {
         token->id = EOF_tkn;
         strncpy(token->name, token_names[EOF_tkn], 12);
@@ -64,6 +71,11 @@ WhiteSpaceState::WhiteSpaceState() {
 NumberState::NumberState() {
     isFinal = false;
 
+    driver[ERROR] = [](char* value, struct token* token, States** states) {
+        token->id = NUM_tkn;
+        strncpy(token->name, token_names[NUM_tkn], 12);
+        return (States*) NULL;
+    };
     driver[ENDOFFILE] = [](char* value, struct token* token, States** states) {
         token->id = NUM_tkn;
         strncpy(token->name, token_names[NUM_tkn], 12);
@@ -79,7 +91,6 @@ NumberState::NumberState() {
         token->id = NUM_tkn;
         strncpy(token->name, token_names[NUM_tkn], 12);
         return (States*) NULL;
-
     };
     driver[DIGIT] = [](char* value, struct token* token, States** states) {
         appendChar(token->value, *value);
@@ -104,7 +115,6 @@ NumberState::NumberState() {
         token->id = NUM_tkn;
         strncpy(token->name, token_names[NUM_tkn], 12);
         return (States*) NULL;
-
     };
 }
 
@@ -116,12 +126,17 @@ NumberState::NumberState() {
 IdentifierState::IdentifierState() {
     isFinal = false;
 
+    driver[ERROR] = [](char* value, struct token* token, States** states) {
+        token->id = IDENT_tkn;
+        strncpy(token->name, token_names[IDENT_tkn], 12);
+        keywordCheck(token);
+        return (States*) NULL;
+    };
     driver[ENDOFFILE] = [](char* value, struct token* token, States** states) {
         token->id = IDENT_tkn;
         strncpy(token->name, token_names[IDENT_tkn], 12);
         keywordCheck(token);
         return (States*) NULL;
-
     };
     driver[WHITESPACE] = [](char* value, struct token* token, States** states) {
         token->id = IDENT_tkn;
@@ -129,7 +144,6 @@ IdentifierState::IdentifierState() {
         states[WHITESPACE]->isFinal = true;
         keywordCheck(token);
         return states[WHITESPACE];
-
     };
     driver[LETTER] = [](char* value, struct token* token, States** states) {
         appendChar(token->value, *value);
@@ -144,7 +158,6 @@ IdentifierState::IdentifierState() {
         strncpy(token->name, token_names[IDENT_tkn], 12);
         keywordCheck(token);
         return (States*) NULL;
-
     };
     driver[EXCLAM] = [](char* value, struct token* token, States** states) {
         token->id = IDENT_tkn;
@@ -163,7 +176,6 @@ IdentifierState::IdentifierState() {
         strncpy(token->name, token_names[IDENT_tkn], 12);
         keywordCheck(token);
         return (States*) NULL;
-
     };
 }
 
@@ -175,6 +187,11 @@ IdentifierState::IdentifierState() {
 AppendableOperatorState::AppendableOperatorState() {
     isFinal = false;
 
+    driver[ERROR] = [](char* value, struct token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        return (States*) NULL;
+    };
     driver[ENDOFFILE] = [](char* value, struct token* token, States** states) {
         token->id = OPERATOR_tkn;
         strncpy(token->name, token_names[OPERATOR_tkn], 12);
@@ -212,13 +229,11 @@ AppendableOperatorState::AppendableOperatorState() {
         token->id = OPERATOR_tkn;
         strncpy(token->name, token_names[OPERATOR_tkn], 12);
         return (States*) NULL;
-
     };
     driver[FINAL_OPERATOR] = [](char* value, struct token* token, States** states) {
         token->id = OPERATOR_tkn;
         strncpy(token->name, token_names[OPERATOR_tkn], 12);
         return (States*) NULL;
-
     };
 }
 
@@ -226,6 +241,11 @@ AppendableOperatorState::AppendableOperatorState() {
 EqualsOperatorState::EqualsOperatorState() {
     isFinal = false;
 
+    driver[ERROR] = [](char* value, struct token* token, States** states) {
+        token->id = ERR_tkn;
+        strncpy(token->name, token_names[ERR_tkn], 12);
+        return (States*) NULL;
+    };
     driver[ENDOFFILE] = [](char* value, struct token* token, States** states) {
         token->id = OPERATOR_tkn;
         strncpy(token->name, token_names[OPERATOR_tkn], 12);
@@ -263,19 +283,22 @@ EqualsOperatorState::EqualsOperatorState() {
         token->id = OPERATOR_tkn;
         strncpy(token->name, token_names[OPERATOR_tkn], 12);
         return (States*) NULL;
-
     };
     driver[FINAL_OPERATOR] = [](char* value, struct token* token, States** states) {
         token->id = OPERATOR_tkn;
         strncpy(token->name, token_names[OPERATOR_tkn], 12);
         return (States*) NULL;
-
     };
 }
 
 ExclamOperatorState::ExclamOperatorState() {
     isFinal = false;
 
+    driver[ERROR] = [](char* value, struct token* token, States** states) {
+        token->id = OPERATOR_tkn;
+        strncpy(token->name, token_names[OPERATOR_tkn], 12);
+        return (States*) NULL;
+    };
     driver[ENDOFFILE] = [](char* value, struct token* token, States** states) {
         token->id = ERR_tkn;
         strncpy(token->name, token_names[ERR_tkn], 12);
@@ -313,12 +336,10 @@ ExclamOperatorState::ExclamOperatorState() {
         token->id = ERR_tkn;
         strncpy(token->name, token_names[ERR_tkn], 12);
         return (States*) NULL;
-
     };
     driver[FINAL_OPERATOR] = [](char* value, struct token* token, States** states) {
         token->id = ERR_tkn;
         strncpy(token->name, token_names[ERR_tkn], 12);
         return (States*) NULL;
-
     };
 }

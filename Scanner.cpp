@@ -30,10 +30,11 @@ struct token Scanner::getToken() {
 
 Scanner::Scanner(FILE* file): file(file), map(std::unordered_map<char, int> (
         {{'\t', WHITESPACE}, {'\n', WHITESPACE}, {' ', WHITESPACE}, {-1, ENDOFFILE},
-         {'<', APPENDABLE_OPERATOR}, {'>', APPENDABLE_OPERATOR},
-         {'[', FINAL_OPERATOR}, {']', FINAL_OPERATOR}, {'(', FINAL_OPERATOR},
-         {')', FINAL_OPERATOR}, {'{', FINAL_OPERATOR}, {'}', FINAL_OPERATOR}, {'=', EQUALS},
-         {'!', EXCLAM}
+         {'<', APPENDABLE_OPERATOR}, {'>', APPENDABLE_OPERATOR}, {'%', FINAL_OPERATOR},
+         {'[', FINAL_OPERATOR}, {']', FINAL_OPERATOR}, {'(', FINAL_OPERATOR}, {'&', FINAL_OPERATOR},
+         {'+', FINAL_OPERATOR}, {'-', FINAL_OPERATOR}, {'*', FINAL_OPERATOR}, {'/', FINAL_OPERATOR},
+         {')', FINAL_OPERATOR}, {'{', FINAL_OPERATOR}, {'}', FINAL_OPERATOR}, {'.', FINAL_OPERATOR},
+         {',', FINAL_OPERATOR}, {';', FINAL_OPERATOR}, {':', FINAL_OPERATOR}, {'=', EQUALS}, {'!', EXCLAM}
         })) {
     int i;
     for (i = 48; i < 58; i++) { map.emplace(i, DIGIT); }

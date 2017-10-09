@@ -7,14 +7,14 @@
 
 #include "token.h"
 
-#define WHITESPACE 0
-#define LETTER 1
-#define DIGIT 2
-#define EQUALS 3
-#define EXCLAM 4
-#define APPENDABLE_OPERATOR 5
-#define FINAL_OPERATOR 6
-#define ERROR 7
+#define ERROR 0
+#define WHITESPACE 1
+#define LETTER 2
+#define DIGIT 3
+#define EQUALS 4
+#define EXCLAM 5
+#define APPENDABLE_OPERATOR 6
+#define FINAL_OPERATOR 7
 #define ENDOFFILE 8
 
 
