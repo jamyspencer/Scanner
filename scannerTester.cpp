@@ -14,7 +14,7 @@ void Parser::parse() {
         }
 
         token_array[array_elements] = scanner.getToken();
-        printf("%s %s\n", token_array[array_elements].name, token_array[array_elements].value);
+        printf("%s %s\n", token_names[token_array[array_elements].id], token_array[array_elements].value);
     } while (token_array[array_elements++].id != EOF_tkn);
     return;
 }

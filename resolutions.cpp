@@ -13,6 +13,5 @@ void keywordCheck(token* token){
     std::string check = std::string(token->value);
     if (keywords[check]){
         token->id = KEYWORD_tkn;
-        strncpy(token->name, token_names[KEYWORD_tkn], 12);
     }
 }

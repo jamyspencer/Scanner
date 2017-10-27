@@ -16,13 +16,28 @@
 #define APPENDABLE_OPERATOR 6
 #define FINAL_OPERATOR 7
 #define ENDOFFILE 8
-
+#define PLUS 9
+#define MINUS 10
+#define TIMES 11
+#define DIVIDE 12
+#define LEFT_BRACKET 13
+#define RIGHT_BRACKET 14
+#define LEFT_PAREN 15
+#define RIGHT_PAREN 16
+#define LEFT_CURLY 17
+#define RIGHT_CURLY 18
+#define DOT 19
+#define COMMA 20
+#define SEMICOLON 21
+#define COLON 22
 
 class States {
 public:
     bool isFinal;
     typedef States*(*FunctionPointer)(char*, token*, States**);
-    FunctionPointer driver[9];
+    FunctionPointer driver[23];
+
+    States();
 };
 
 class WhiteSpaceState: public States {

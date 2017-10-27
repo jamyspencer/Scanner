@@ -18,6 +18,7 @@ private:
     char value;
     struct token token;
     std::unordered_map<char, int> map;
+    int mapValue = 1;
 
 public:
     Scanner(FILE *file);
