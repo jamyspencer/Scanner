@@ -3,22 +3,16 @@
 //
 
 #include <cstdio>
-#include <cstdlib>
 #include "scannerTester.h"
 
 void Parser::parse() {
     do {
-        if (array_elements + 1 > array_size) {
-            token_array = (token *) (realloc(token_array, array_size + 100));
-            array_size += 100;
-        }
 
-        token_array[array_elements] = scanner.getToken();
-        printf("%s %s\n", token_names[token_array[array_elements].id], token_array[array_elements].value);
-    } while (token_array[array_elements++].id != EOF_tkn);
+        currentToken = scanner.getToken();
+        printf("%-18s %-11s %d\n", token_names[currentToken.id], currentToken.value, currentToken.line);
+    } while (currentToken.id != EOF_tkn && currentToken.id != ERR_tkn);
     return;
 }
 
 Parser::Parser(FILE *source_file):
-        scanner(Scanner(source_file)),
-        source_file (source_file){}
+        scanner(Scanner(source_file)){}

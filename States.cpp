@@ -6,14 +6,7 @@
 #include "States.h"
 #include "StrFunctions.h"
 #include "resolutions.h"
-/**************************************************************************************
-*
-* Inheritable Constructor
-*
-**************************************************************************************/
-States::States() {
 
-}
 /**************************************************************************************
 *
 * WhiteSpaceState functions
@@ -23,128 +16,151 @@ States::States() {
 WhiteSpaceState::WhiteSpaceState() {
     isFinal = false;
 
-    driver[ERROR] = [](char* value, struct token* token, States** states) {
+    driver[ERROR] = [](char value, struct token* token, States** states) {
         token->id = ERR_tkn;
-        appendChar(token->value, *value);
+        appendChar(token->value, value);
+        printf("ERROR: Invalid character: %c\n", value);
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[ENDOFFILE] = [](char* value, struct token* token, States** states) {
+    driver[ENDOFFILE] = [](char value, struct token* token, States** states) {
         token->id = EOF_tkn;
-        return (States*) NULL;
+        return (States*) nullptr;
     };
-    driver[WHITESPACE] = [](char* value, struct token* token, States** states) {
+    driver[WHITESPACE] = [](char value, struct token* token, States** states) {
+        if (value == '\n') { (token->line)++; }
         return states[WHITESPACE];
     };
-    driver[LETTER] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[LETTER] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         return states[LETTER];
     };
-    driver[DIGIT] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[DIGIT] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         return states[DIGIT];
     };
-    driver[EQUALS] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[EQUALS] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         return states[EQUALS];
     };
-    driver[EXCLAM] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
-        return states[EXCLAM];
+    driver[EXCLAM] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
+        if(states[0] != nullptr) { delete (states[0]); }
+        states[0] = new ExclamOperatorState();
+        return states[0];
     };
-    driver[APPENDABLE_OPERATOR] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
-        return states[APPENDABLE_OPERATOR];
+    driver[GREATER_OPERATOR] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
+        if(states[0] != nullptr) { delete (states[0]); }
+        states[0] = new GreaterOperatorState();
+        return states[0];
     };
-    driver[FINAL_OPERATOR] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        appendChar(token->value, *value);
-        states[WHITESPACE]->isFinal = true;
-        return states[WHITESPACE];
+    driver[LESS_OPERATOR] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
+        if(states[0] != nullptr) { delete (states[0]); }
+        states[0] = new LessOperatorState();
+        return states[0];
     };
-    driver[PLUS] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[PLUS] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = PLUS_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[MINUS] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[MINUS] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = MINUS_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[TIMES] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[TIMES] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = TIMES_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[DIVIDE] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[DIVIDE] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = DIVDE_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[LEFT_BRACKET] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[AMPERSAND] = [](char value, struct token* token, States** states){
+        appendChar(token->value, value);
+        token->id = AMPERSAND_tkn;
+        states[WHITESPACE]->isFinal = true;
+        return states[WHITESPACE];
+    };
+    driver[PERCENT] = [](char value, struct token* token, States** states){
+        appendChar(token->value, value);
+        token->id = PERCENT_tkn;
+        states[WHITESPACE]->isFinal = true;
+        return states[WHITESPACE];
+    };
+    driver[LEFT_BRACKET] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = LEFT_BRACKET_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[RIGHT_BRACKET] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[RIGHT_BRACKET] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = RIGHT_BRACKET_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[LEFT_PAREN] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[LEFT_PAREN] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = LEFT_PAREN_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[RIGHT_PAREN] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[RIGHT_PAREN] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = RIGHT_PAREN_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[LEFT_CURLY] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[LEFT_CURLY] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = LEFT_CURLY_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[RIGHT_CURLY] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[RIGHT_CURLY] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = RIGHT_CURLY_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[DOT] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[DOT] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = DOT_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[COMMA] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[COMMA] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = COMMA_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[SEMICOLON] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[SEMICOLON] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = SEMICOLON_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[COLON] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[COLON] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = COLON_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
+    };
+    driver[HASH] = [](char value, struct token* token, States** states) {
+        if(states[0] != nullptr) { delete (states[0]); }
+        states[0] = new CommentState();
+        return states[0];
     };
 }
 
@@ -156,75 +172,44 @@ WhiteSpaceState::WhiteSpaceState() {
 NumberState::NumberState() {
     isFinal = false;
 
-    driver[ERROR] = [](char* value, struct token* token, States** states) {
+    driver[ERROR] = [](char value, struct token* token, States** states) {
         token->id = NUM_tkn;
-        return (States*) NULL;
+        return (States*) nullptr;
     };
-    driver[ENDOFFILE] = [](char* value, struct token* token, States** states) {
+    driver[ENDOFFILE] = [](char value, struct token* token, States** states) {
         token->id = NUM_tkn;
-        return (States*) NULL;
+        return (States*) nullptr;
     };
-    driver[WHITESPACE] = [](char* value, struct token* token, States** states) {
+    driver[WHITESPACE] = driver[ENDOFFILE];
+    driver[LETTER] = [](char value, struct token* token, States** states) {
         token->id = NUM_tkn;
-        states[WHITESPACE]->isFinal = true;
-        return states[WHITESPACE];
+        return (States*) nullptr;
     };
-    driver[LETTER] = [](char* value, struct token* token, States** states) {
-        token->id = NUM_tkn;
-        return (States*) NULL;
-    };
-    driver[DIGIT] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[DIGIT] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);  
         return states[DIGIT];
     };
-    driver[EQUALS] = [](char* value, struct token* token, States** states) {
-        token->id = NUM_tkn;
-        return (States*) NULL;
-    };
-    driver[EXCLAM] = [](char* value, struct token* token, States** states) {
-        token->id = NUM_tkn;
-        return (States*) NULL;
-    };
-    driver[APPENDABLE_OPERATOR] = [](char* value, struct token* token, States** states) {
-        token->id = NUM_tkn;
-        return (States*) NULL;
-    };
-    driver[FINAL_OPERATOR] = [](char* value, struct token* token, States** states) {
-        token->id = NUM_tkn;
-        return (States*) NULL;
-    };
-    driver[PLUS] = [](char* value, struct token* token, States** states) {
-        token->id = NUM_tkn;
-        return (States*) NULL;
-    };
-    driver[MINUS] = [](char* value, struct token* token, States** states) {
-        token->id = NUM_tkn;
-        return (States*) NULL;
-    };
-    driver[TIMES] = [](char* value, struct token* token, States** states) {
-        token->id = NUM_tkn;
-        return (States*) NULL;
-    };
-    driver[DIVIDE] = [](char* value, struct token* token, States** states) {
-        token->id = NUM_tkn;
-        return (States*) NULL;
-    };
-    driver[LEFT_BRACKET] = [](char* value, struct token* token, States** states) {
-        token->id = NUM_tkn;
-        return (States*) NULL;
-    };
+    driver[EQUALS] = driver[LETTER];
+    driver[EXCLAM] = driver[LETTER];
+    driver[GREATER_OPERATOR] = driver[LETTER];
+    driver[LESS_OPERATOR] = driver[LETTER];
+    driver[PLUS] = driver[LETTER];
+    driver[MINUS] = driver[LETTER];
+    driver[TIMES] = driver[LETTER];
+    driver[DIVIDE] = driver[LETTER];
+    driver[AMPERSAND] = driver[LETTER];
+    driver[PERCENT] = driver[LETTER];
+    driver[LEFT_BRACKET] = driver[LETTER];
     driver[RIGHT_BRACKET] = driver[LETTER];
     driver[LEFT_PAREN] = driver[LETTER];
     driver[RIGHT_PAREN] = driver[LETTER];
     driver[LEFT_CURLY] = driver[LETTER];
     driver[RIGHT_CURLY] = driver[LETTER];
     driver[DOT] = driver[LETTER];
-    driver[COMMA] = [](char* value, struct token* token, States** states) {
-        token->id = NUM_tkn;
-        return (States*) NULL;
-    };
+    driver[COMMA] = driver[LETTER];
     driver[SEMICOLON] = driver[LETTER];
     driver[COLON] = driver[LETTER];
+    driver[HASH] = driver[LETTER];
 }
 
 /**************************************************************************************
@@ -235,253 +220,263 @@ NumberState::NumberState() {
 IdentifierState::IdentifierState() {
     isFinal = false;
 
-    driver[ERROR] = [](char* value, struct token* token, States** states) {
+    driver[ERROR] = [](char value, struct token* token, States** states) {
         token->id = IDENT_tkn;
         keywordCheck(token);
-        return (States*) NULL;
+        return (States*) nullptr;
     };
-    driver[ENDOFFILE] = [](char* value, struct token* token, States** states) {
+    driver[ENDOFFILE] = [](char value, struct token* token, States** states) {
         token->id = IDENT_tkn;
         keywordCheck(token);
-        return (States*) NULL;
+        return (States*) nullptr;
     };
-    driver[WHITESPACE] = [](char* value, struct token* token, States** states) {
-        token->id = IDENT_tkn;
-        states[WHITESPACE]->isFinal = true;
-        keywordCheck(token);
-        return states[WHITESPACE];
-    };
-    driver[LETTER] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[WHITESPACE] = driver[ENDOFFILE];
+    driver[LETTER] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         return states[LETTER];
     };
-    driver[DIGIT] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
-        return states[LETTER];
-    };
-    driver[EQUALS] = [](char* value, struct token* token, States** states) {
-        token->id = IDENT_tkn;
-        keywordCheck(token);
-        return (States*) NULL;
-    };
-    driver[EXCLAM] = [](char* value, struct token* token, States** states) {
-        token->id = IDENT_tkn;
-        keywordCheck(token);
-        return (States*) NULL;
-    };
-    driver[APPENDABLE_OPERATOR] = [](char* value, struct token* token, States** states) {
-        token->id = IDENT_tkn;
-        keywordCheck(token);
-        return (States*) NULL;
-    };
-    driver[FINAL_OPERATOR] = [](char* value, struct token* token, States** states) {
-        token->id = IDENT_tkn;
-        keywordCheck(token);
-        return (States*) NULL;
-    };
-    driver[PLUS] = [](char* value, struct token* token, States** states) {
-        token->id = IDENT_tkn;
-        return (States*) NULL;
-    };
-    driver[MINUS] = [](char* value, struct token* token, States** states) {
-        token->id = IDENT_tkn;
-        return (States*) NULL;
-    };
-    driver[TIMES] = [](char* value, struct token* token, States** states) {
-        token->id = IDENT_tkn;
-        return (States*) NULL;
-    };
-    driver[DIVIDE] = [](char* value, struct token* token, States** states) {
-        token->id = IDENT_tkn;
-        return (States*) NULL;
-    };
-
+    driver[DIGIT] = driver[LETTER];
+    driver[EQUALS] = driver[ENDOFFILE];
+    driver[EXCLAM] = driver[ENDOFFILE];
+    driver[GREATER_OPERATOR] = driver[ENDOFFILE];
+    driver[LESS_OPERATOR] = driver[ENDOFFILE];
+    driver[PLUS] = driver[ENDOFFILE];
+    driver[MINUS] = driver[ENDOFFILE];
+    driver[TIMES] = driver[ENDOFFILE];
+    driver[DIVIDE] = driver[ENDOFFILE];
+    driver[AMPERSAND] = driver[ENDOFFILE];
+    driver[PERCENT] = driver[ENDOFFILE];
+    driver[LEFT_BRACKET] = driver[ENDOFFILE];
+    driver[RIGHT_BRACKET] = driver[ENDOFFILE];
+    driver[LEFT_PAREN] = driver[ENDOFFILE];
+    driver[RIGHT_PAREN] = driver[ENDOFFILE];
+    driver[LEFT_CURLY] = driver[ENDOFFILE];
+    driver[RIGHT_CURLY] = driver[ENDOFFILE];
+    driver[DOT] = driver[ENDOFFILE];
+    driver[COMMA] = driver[ENDOFFILE];
+    driver[SEMICOLON] = driver[ENDOFFILE];
+    driver[COLON] = driver[ENDOFFILE];
+    driver[HASH] = driver[LETTER];
 }
 
 /**************************************************************************************
 *
-* OperatorState functions
+* GreaterOperatorState functions
 *
 **************************************************************************************/
-AppendableOperatorState::AppendableOperatorState() {
+GreaterOperatorState::GreaterOperatorState() {
     isFinal = false;
 
-    driver[ERROR] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
+    driver[ERROR] = [](char value, struct token* token, States** states) {
+        token->id = GREATER_tkn;
+        return (States*) nullptr;
     };
-    driver[ENDOFFILE] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
+    driver[ENDOFFILE] = [](char value, struct token* token, States** states) {
+        token->id = GREATER_tkn;
+        return (States*) nullptr;
     };
-    driver[WHITESPACE] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
+    driver[WHITESPACE] = driver[ENDOFFILE];
+    driver[LETTER] = [](char value, struct token* token, States** states) {
+        token->id = GREATER_tkn;
+        return (States*) nullptr;
+    };
+    driver[DIGIT] = driver[LETTER];
+    driver[EQUALS] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
+        token->id = GREATER_EQUALS_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
-    };
-    driver[LETTER] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[DIGIT] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[EQUALS] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
-        token->id = OPERATOR_tkn;
-        states[WHITESPACE]->isFinal = true;
-        return states[WHITESPACE];
-    };
-    driver[EXCLAM] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[APPENDABLE_OPERATOR] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[FINAL_OPERATOR] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[PLUS] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[MINUS] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[TIMES] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[DIVIDE] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
+    };    driver[EXCLAM] = driver[LETTER];
+    driver[GREATER_OPERATOR] = driver[LETTER];
+    driver[LESS_OPERATOR] = driver[LETTER];
+    driver[PLUS] = driver[LETTER];
+    driver[MINUS] = driver[LETTER];
+    driver[TIMES] = driver[LETTER];
+    driver[DIVIDE] = driver[LETTER];
+    driver[AMPERSAND] = driver[LETTER];
+    driver[PERCENT] = driver[LETTER];
+    driver[LEFT_BRACKET] = driver[LETTER];
+    driver[RIGHT_BRACKET] = driver[LETTER];
+    driver[LEFT_PAREN] = driver[LETTER];
+    driver[RIGHT_PAREN] = driver[LETTER];
+    driver[LEFT_CURLY] = driver[LETTER];
+    driver[RIGHT_CURLY] = driver[LETTER];
+    driver[DOT] = driver[LETTER];
+    driver[COMMA] = driver[LETTER];
+    driver[SEMICOLON] = driver[LETTER];
+    driver[COLON] = driver[LETTER];
+    driver[HASH] = driver[LETTER];
 }
 
 
 EqualsOperatorState::EqualsOperatorState() {
     isFinal = false;
 
-    driver[ERROR] = [](char* value, struct token* token, States** states) {
+    driver[ERROR] = [](char value, struct token* token, States** states) {
         token->id = ERR_tkn;
-        return (States*) NULL;
+        return (States*) nullptr;
     };
-    driver[ENDOFFILE] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return states[ENDOFFILE];
+    driver[ENDOFFILE] = [](char value, struct token* token, States** states) {
+        token->id = EQUALS_tkn;
+        return (States*) nullptr;
     };
-    driver[WHITESPACE] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        states[WHITESPACE]->isFinal = true;
-        return states[WHITESPACE];
+    driver[WHITESPACE] = driver[ENDOFFILE];
+    driver[LETTER] = [](char value, struct token* token, States** states) {
+        token->id = EQUALS_tkn;
+        return (States*) nullptr;
     };
-    driver[LETTER] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[DIGIT] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[EQUALS] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[DIGIT] = driver[LETTER];
+    driver[EQUALS] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = EQUALS_EQUALS_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[EXCLAM] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[APPENDABLE_OPERATOR] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[FINAL_OPERATOR] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[PLUS] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[MINUS] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[TIMES] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
-    driver[DIVIDE] = [](char* value, struct token* token, States** states) {
-        token->id = OPERATOR_tkn;
-        return (States*) NULL;
-    };
+    driver[EXCLAM] = driver[LETTER];
+    driver[GREATER_OPERATOR] = driver[LETTER];
+    driver[LESS_OPERATOR] = driver[LETTER];
+    driver[PLUS] = driver[LETTER];
+    driver[MINUS] = driver[LETTER];
+    driver[TIMES] = driver[LETTER];
+    driver[DIVIDE] = driver[LETTER];
+    driver[AMPERSAND] = driver[LETTER];
+    driver[PERCENT] = driver[LETTER];
+    driver[LEFT_BRACKET] = driver[LETTER];
+    driver[RIGHT_BRACKET] = driver[LETTER];
+    driver[LEFT_PAREN] = driver[LETTER];
+    driver[RIGHT_PAREN] = driver[LETTER];
+    driver[LEFT_CURLY] = driver[LETTER];
+    driver[RIGHT_CURLY] = driver[LETTER];
+    driver[DOT] = driver[LETTER];
+    driver[COMMA] = driver[LETTER];
+    driver[SEMICOLON] = driver[LETTER];
+    driver[COLON] = driver[LETTER];
+    driver[HASH] = driver[LETTER];
 }
 
 ExclamOperatorState::ExclamOperatorState() {
     isFinal = false;
 
-    driver[ERROR] = [](char* value, struct token* token, States** states) {
+    driver[ERROR] = [](char value, struct token* token, States** states) {
         token->id = ERR_tkn;
-        return (States*) NULL;
+        printf("ERROR: '!' must be followed by '='\n");
+        return (States*) nullptr;
     };
-    driver[ENDOFFILE] = [](char* value, struct token* token, States** states) {
-        token->id = ERR_tkn;
-        return (States*) NULL;
-    };
-    driver[WHITESPACE] = [](char* value, struct token* token, States** states) {
-        token->id = ERR_tkn;
-        states[WHITESPACE]->isFinal = true;
-        return states[WHITESPACE];
-    };
-    driver[LETTER] = [](char* value, struct token* token, States** states) {
-        token->id = ERR_tkn;
-        return (States*) NULL;
-    };
-    driver[DIGIT] = [](char* value, struct token* token, States** states) {
-        token->id = ERR_tkn;
-        return (States*) NULL;
-    };
-    driver[EQUALS] = [](char* value, struct token* token, States** states) {
-        appendChar(token->value, *value);
+    driver[ENDOFFILE] = driver[ERROR];
+    driver[WHITESPACE] = driver[ERROR];
+    driver[LETTER] = driver[ERROR];
+    driver[DIGIT] = driver[ERROR];
+    driver[EQUALS] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
         token->id = NOT_EQUALS_tkn;
         states[WHITESPACE]->isFinal = true;
         return states[WHITESPACE];
     };
-    driver[EXCLAM] = [](char* value, struct token* token, States** states) {
-        token->id = ERR_tkn;
-        return (States*) NULL;
-    };
-    driver[APPENDABLE_OPERATOR] = [](char* value, struct token* token, States** states) {
-        token->id = ERR_tkn;
-        return (States*) NULL;
-    };
-    driver[FINAL_OPERATOR] = [](char* value, struct token* token, States** states) {
-        token->id = ERR_tkn;
-        return (States*) NULL;
-    };
-    driver[PLUS] = [](char* value, struct token* token, States** states) {
-        token->id = ERR_tkn;
-        return (States*) NULL;
-    };
-    driver[MINUS] = [](char* value, struct token* token, States** states) {
-        token->id = ERR_tkn;
-        return (States*) NULL;
-    };
-    driver[TIMES] = [](char* value, struct token* token, States** states) {
-        token->id = ERR_tkn;
-        return (States*) NULL;
-    };
-    driver[DIVIDE] = [](char* value, struct token* token, States** states) {
-        token->id = ERR_tkn;
-        return (States*) NULL;
-    };
+    driver[EXCLAM] = driver[ERROR];
+    driver[GREATER_OPERATOR] = driver[ERROR];
+    driver[LESS_OPERATOR] = driver[ERROR];
+    driver[PLUS] = driver[ERROR];
+    driver[MINUS] = driver[ERROR];
+    driver[TIMES] = driver[ERROR];
+    driver[DIVIDE] = driver[ERROR];
+    driver[AMPERSAND] = driver[ERROR];
+    driver[PERCENT] = driver[ERROR];
+    driver[LEFT_BRACKET] = driver[ERROR];
+    driver[RIGHT_BRACKET] = driver[ERROR];
+    driver[LEFT_PAREN] = driver[ERROR];
+    driver[RIGHT_PAREN] = driver[ERROR];
+    driver[LEFT_CURLY] = driver[ERROR];
+    driver[RIGHT_CURLY] = driver[ERROR];
+    driver[DOT] = driver[ERROR];
+    driver[COMMA] = driver[ERROR];
+    driver[SEMICOLON] = driver[ERROR];
+    driver[COLON] = driver[ERROR];
+    driver[HASH] = driver[ERROR];
 }
 
+LessOperatorState::LessOperatorState() {
+    isFinal = false;
 
+    driver[ERROR] = [](char value, struct token* token, States** states) {
+        token->id = LESS_tkn;
+        return (States*) nullptr;
+    };
+    driver[ENDOFFILE] = [](char value, struct token* token, States** states) {
+        token->id = LESS_tkn;
+        return (States*) nullptr;
+    };
+    driver[WHITESPACE] = driver[ENDOFFILE];
+    driver[LETTER] = [](char value, struct token* token, States** states) {
+        token->id = LESS_tkn;
+        return (States*) nullptr;
+    };
+    driver[DIGIT] = driver[LETTER];
+    driver[EQUALS] = [](char value, struct token* token, States** states) {
+        appendChar(token->value, value);
+        token->id = LESS_EQUALS_tkn;
+        states[WHITESPACE]->isFinal = true;
+        return states[WHITESPACE];
+    };
+    driver[EXCLAM] = driver[LETTER];
+    driver[GREATER_OPERATOR] = driver[LETTER];
+    driver[LESS_OPERATOR] = driver[LETTER];
+    driver[PLUS] = driver[LETTER];
+    driver[MINUS] = driver[LETTER];
+    driver[TIMES] = driver[LETTER];
+    driver[DIVIDE] = driver[LETTER];
+    driver[AMPERSAND] = driver[LETTER];
+    driver[PERCENT] = driver[LETTER];
+    driver[LEFT_BRACKET] = driver[LETTER];
+    driver[RIGHT_BRACKET] = driver[LETTER];
+    driver[LEFT_PAREN] = driver[LETTER];
+    driver[RIGHT_PAREN] = driver[LETTER];
+    driver[LEFT_CURLY] = driver[LETTER];
+    driver[RIGHT_CURLY] = driver[LETTER];
+    driver[DOT] = driver[LETTER];
+    driver[COMMA] = driver[LETTER];
+    driver[SEMICOLON] = driver[LETTER];
+    driver[COLON] = driver[LETTER];
+    driver[HASH] = driver[LETTER];
+}
+
+CommentState::CommentState() {
+    isFinal = false;
+
+    driver[ERROR] = [](char value, struct token* token, States** states) {
+        return states[0];
+    };
+    driver[ENDOFFILE] = [](char value, struct token* token, States** states) {
+        token->id = EOF_tkn;
+        printf("WARNING: file ended within a comment\n");
+        return (States *) nullptr;
+    };
+    driver[WHITESPACE] = [](char value, struct token* token, States** states) {
+        if (value == '\n') { (token->line)++; }
+        return states[0];
+    };
+    driver[LETTER] = driver[ERROR];
+    driver[DIGIT] = driver[ERROR];
+    driver[EQUALS] = driver[ERROR];
+    driver[EXCLAM] = driver[ERROR];
+    driver[GREATER_OPERATOR] = driver[ERROR];
+    driver[LESS_OPERATOR] = driver[ERROR];
+    driver[PLUS] = driver[ERROR];
+    driver[MINUS] = driver[ERROR];
+    driver[TIMES] = driver[ERROR];
+    driver[DIVIDE] = driver[ERROR];
+    driver[AMPERSAND] = driver[ERROR];
+    driver[PERCENT] = driver[ERROR];
+    driver[LEFT_BRACKET] = driver[ERROR];
+    driver[RIGHT_BRACKET] = driver[ERROR];
+    driver[LEFT_PAREN] = driver[ERROR];
+    driver[RIGHT_PAREN] = driver[ERROR];
+    driver[LEFT_CURLY] = driver[ERROR];
+    driver[RIGHT_CURLY] = driver[ERROR];
+    driver[DOT] = driver[ERROR];
+    driver[COMMA] = driver[ERROR];
+    driver[SEMICOLON] = driver[ERROR];
+    driver[COLON] = driver[ERROR];
+    driver[HASH] = [](char value, struct token* token, States** states) {
+        return states[WHITESPACE];
+    };
+}

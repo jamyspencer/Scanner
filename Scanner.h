@@ -12,13 +12,12 @@
 
 class Scanner{
 private:
-    States *states[7];
+    States *states[5];
     States *currentState;
     FILE* file;
     char value;
     struct token token;
     std::unordered_map<char, int> map;
-    int mapValue = 1;
 
 public:
     Scanner(FILE *file);

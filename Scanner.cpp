@@ -6,24 +6,22 @@
 #include <cstdlib>
 
 #include "Scanner.h"
-#include "token.h"
 
 struct token Scanner::getToken() {
 
     token.value[0] = '\0';
 
     //this corrects the state due to look-aheads
-    if (currentState == NULL) {
+    if (currentState == nullptr) {
         currentState = states[WHITESPACE];
-        currentState = currentState->driver[map[value]](&value, &token, states);
+        currentState = currentState->driver[map[value]](value, &token, states);
     } else {
         currentState->isFinal = false;
     }
     //primary token generating loop
-    while (currentState != NULL && !currentState->isFinal) {
+    while (currentState != nullptr && !currentState->isFinal) {
         value = fgetc(file);
-        mapValue = map[value];
-        currentState = currentState->driver[mapValue](&value, &token, states);
+        currentState = currentState->driver[map[value]](value, &token, states);
     }
 
     return token;
@@ -31,25 +29,26 @@ struct token Scanner::getToken() {
 
 Scanner::Scanner(FILE* file): file(file), map(std::unordered_map<char, int> (
         {{'\t', WHITESPACE}, {'\n', WHITESPACE}, {' ', WHITESPACE}, {-1, ENDOFFILE},
-         {'<', APPENDABLE_OPERATOR}, {'>', APPENDABLE_OPERATOR}, {'%', FINAL_OPERATOR},
-         {'+', PLUS}, {'-', MINUS}, {'*', TIMES}, {'/', DIVIDE}, {'&', FINAL_OPERATOR},
+         {'<', LESS_OPERATOR}, {'>', GREATER_OPERATOR}, {'%', PERCENT},
+         {'+', PLUS}, {'-', MINUS}, {'*', TIMES}, {'/', DIVIDE}, {'&', AMPERSAND},
          {'[', LEFT_BRACKET}, {']', RIGHT_BRACKET}, {'(', LEFT_PAREN},
          {')', RIGHT_PAREN}, {'{', LEFT_CURLY}, {'}', RIGHT_CURLY}, {'.', DOT},
-         {',', COMMA}, {';', SEMICOLON}, {':', COLON}, {'=', EQUALS}, {'!', EXCLAM}
+         {',', COMMA}, {';', SEMICOLON}, {':', COLON}, {'=', EQUALS}, {'!', EXCLAM},
+         {'#', HASH}
         })) {
     int i;
     for (i = 48; i < 58; i++) { map.emplace(i, DIGIT); }
     for (i = 65; i < 91; i++){ map.emplace (i, LETTER); } //upper
     for (i = 97 ; i < 123; i++){  map.emplace(i, LETTER); } //lower
 
+    token.line = 1;
 
-    states[ERROR] = NULL;
+    states[0] = nullptr;
     states[WHITESPACE] = (States *) new WhiteSpaceState();
     states[LETTER] = (States *) new IdentifierState();
     states[DIGIT] = (States *) new NumberState();
     states[EQUALS] = (States *) new EqualsOperatorState();
-    states[EXCLAM] = (States *) new ExclamOperatorState();
-    states[APPENDABLE_OPERATOR] = (States *) new AppendableOperatorState();
+
     currentState = states[WHITESPACE];
 
 //    printf("mymap contains:\n");
@@ -58,10 +57,9 @@ Scanner::Scanner(FILE* file): file(file), map(std::unordered_map<char, int> (
 }
 
 Scanner::~Scanner() {
+    delete(states[0]);
     delete(states[WHITESPACE]);
     delete(states[LETTER]);
     delete(states[DIGIT]);
     delete(states[EQUALS]);
-    delete(states[EXCLAM]);
-    delete(states[APPENDABLE_OPERATOR]);
 }

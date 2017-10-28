@@ -7,7 +7,7 @@ int main(int argc, char* argv[]){
 
 
     FILE* info_file;
-    char* mode = "r";
+    const char* mode = "r";
     char* file_name = NULL;
 
     if (argc == 2){ //1 parameter given
@@ -24,7 +24,7 @@ int main(int argc, char* argv[]){
     else if (argc == 1){//no parameters given
         info_file = stdin;
         file_name = (char*) malloc (sizeof(char) * 9);
-        file_name = "keyboard";
+        strcpy(file_name, "keyboard");
     }
     else {//exit with error message
         printf("You must include either 1 or 0 arguements.\n");

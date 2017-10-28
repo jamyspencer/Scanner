@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS  = -g -Wall -std=c++11 -fno-inline-functions
-TARGET = scanner
+TARGET = testScanner
 
 OBJECTS = main.o scannerTester.o Scanner.o States.o token.o StrFunctions.o resolutions.o
 

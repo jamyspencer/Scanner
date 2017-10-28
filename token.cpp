@@ -4,11 +4,13 @@
 
 #include "token.h"
 
-char* token_names[22] = {"ERR_tkn",
+const char* token_names[28] = {"ERR_tkn",
                          "PLUS_tkn",
                          "MINUS_tkn",
                          "TIMES_tkn",
                          "DIVDE_tkn",
+                         "AMPERSAND_tkn",
+                         "PERCENT_tkn",
                          "LEFT_BRACKET_tkn",
                          "RIGHT_BRACKET_tkn",
                          "LEFT_PAREN_tkn",
@@ -24,5 +26,9 @@ char* token_names[22] = {"ERR_tkn",
                          "NUM_tkn",
                          "IDENT_tkn",
                          "KEYWORD_tkn",
-                         "OPERATOR_tkn",
+                         "EQUALS_tkn",
+                         "GREATER_tkn",
+                         "LESS_tkn",
+                         "GREATER_EQUALS_tkn",
+                         "LESS_EQUALS_tkn",
                          "EOF_tkn"};

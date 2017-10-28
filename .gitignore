@@ -2,6 +2,6 @@ cmake-build-debug
 .idea
 temp
 CMakeLists.txt
-scanner
+testScanner
 Tests/
 

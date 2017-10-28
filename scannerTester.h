@@ -14,12 +14,8 @@ public:
     void parse();
 
 private:
-    int array_size = 100;
-    int array_elements = 0;
-    token* token_array = (token*) malloc (sizeof(token) * array_size);
-    FILE* source_file;
     Scanner scanner;
-
+    struct token currentToken;
 };
 
 #endif

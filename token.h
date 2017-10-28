@@ -6,7 +6,7 @@
 #define FRONTEND_TOKEN_H
 
 
-extern char* token_names[22];
+extern const char* token_names[28];
 
 enum token_id{
     ERR_tkn,
@@ -14,6 +14,8 @@ enum token_id{
     MINUS_tkn,
     TIMES_tkn,
     DIVDE_tkn,
+    AMPERSAND_tkn,
+    PERCENT_tkn,
     LEFT_BRACKET_tkn,
     RIGHT_BRACKET_tkn,
     LEFT_PAREN_tkn,
@@ -29,13 +31,17 @@ enum token_id{
     NUM_tkn,
     IDENT_tkn,
     KEYWORD_tkn,
-    OPERATOR_tkn,
+    EQUALS_tkn,
+    GREATER_tkn,
+    LESS_tkn,
+    GREATER_EQUALS_tkn,
+    LESS_EQUALS_tkn,
     EOF_tkn
 };
 
 struct token {
     token_id id;
     char value[10];
-    int row;
+    int line;
 };
 #endif
