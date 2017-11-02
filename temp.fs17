@@ -1,11 +1,11 @@
-1Program
-=  <  <=  >  >=  !=  ==  :   +  -  *  /  &  %  . (  ) , { } ; [ ]
+Var x, y.
 #
 
 efhrsveraergrgv Begin ENDOFFILE
 
 #
+Begin
+x:5;
 
-num >2
-3=g<=Bob
-Program(1=x==2)
+
+End

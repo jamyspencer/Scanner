@@ -36,7 +36,18 @@ enum token_id{
     LESS_tkn,
     GREATER_EQUALS_tkn,
     LESS_EQUALS_tkn,
-    EOF_tkn
+    EOF_tkn,
+
+    BEGIN_KEYWORD_tkn,
+    END_KEYWORD_tkn,
+    CHECK_KEYWORD_tkn,
+    LOOP_KEYWORD_tkn,
+    VOID_KEYWORD_tkn,
+    VAR_KEYWORD_tkn,
+    RETURN_KEYWORD_tkn,
+    INPUT_KEYWORD_tkn,
+    OUTPUT_KEYWORD_tkn,
+    PROGRAM_KEYWORD_tkn
 };
 
 struct token {
