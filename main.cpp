@@ -1,14 +1,16 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <cstring>
-#include "scannerTester.h"
+#include "Parser.h"
+
 
 int main(int argc, char* argv[]){
 
 
     FILE* info_file;
     const char* mode = "r";
-    char* file_name = NULL;
+    char* file_name = nullptr;
+    Node* parseTree = nullptr;
 
     if (argc == 2){ //1 parameter given
         file_name = (char*) malloc (sizeof(char) * (strlen(argv[1]) + 5));
@@ -31,7 +33,9 @@ int main(int argc, char* argv[]){
         return(1);
     }
     Parser parser = Parser(info_file);
-    parser.parse();
+    parseTree = parser.parse();
 
+
+    parseTree->traversePreOrder();
     return 0;
 }

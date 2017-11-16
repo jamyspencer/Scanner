@@ -2,38 +2,39 @@
 // Created by jamy on 10/7/17.
 //
 
-#ifndef FRONTEND_SCANNERTESTER_H
-#define FRONTEND_SCANNERTESTER_H
+#ifndef FRONTEND_PARSER_H
+#define FRONTEND_PARSER_H
 
 #include "Scanner.h"
 #include "token.h"
+#include "Node.h"
 
 class Parser{
 public:
     Parser(FILE*);
-    void parse();
+    Node* parse();
 
 private:
     Scanner scanner;
     struct token currentToken;
     void error(std::string);
-    void vars();
-    void mvars();
-    void program();
-    void block();
-    void stats();
-    void stat();
-    void mStat();
-    void in();
-    void out();
-    void check();
-    void loop();
-    void assign();
-    void expr();
-    void M();
-    void R();
-    void F();
-    void RO();
+    Node* vars();
+    Node* mvars();
+    Node* program();
+    Node* block();
+    Node* stats();
+    Node* stat();
+    Node* mStat();
+    Node* in();
+    Node* out();
+    Node* check();
+    Node* loop();
+    Node* assign();
+    Node* expr();
+    Node* M();
+    Node* R();
+    Node* F();
+    Node* RO();
 };
 
 #endif

@@ -1,12 +1,1 @@
-I am implementing option 3 (FSA)
-
-The table is not directly a two dimensional array. It is an array of Objects -- states[] in Scanner.h,
-Scanner.cpp The objects are polymorphic, using a Protocol Oriented Programming design.
-The object contains an array of lamdas -- driver[] So the table itself contains the driver. These
-objects are defined in States.h, States.cpp.
-
-There are 8 explicitly defined States that are relevant, the rest are handled with the null pointer.
-To reduce the number of states stored at any one time I made the comment, greater than, less than and
-bang states instantiated only when required. If this would be developed further I would create a timed
-test to see any performance differences and possibly change this.
-
+This program creates a parse tree and prints its contents.

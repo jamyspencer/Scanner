@@ -30,7 +30,6 @@ enum token_id{
     EQUALS_EQUALS_tkn,
     NUM_tkn,
     IDENT_tkn,
-    KEYWORD_tkn,
     EQUALS_tkn,
     GREATER_tkn,
     LESS_tkn,
@@ -47,11 +46,12 @@ enum token_id{
     RETURN_KEYWORD_tkn,
     INPUT_KEYWORD_tkn,
     OUTPUT_KEYWORD_tkn,
-    PROGRAM_KEYWORD_tkn
+    PROGRAM_KEYWORD_tkn,
+    BLANK_tkn
 };
 
 struct token {
-    token_id id;
+    token_id id = BLANK_tkn;
     char value[10];
     int line;
 };

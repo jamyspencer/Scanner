@@ -1,11 +1,17 @@
-Var x, y.
-#
-
-efhrsveraergrgv Begin ENDOFFILE
-
-#
+Var x , y .
 Begin
-x:5;
-
-
+  Input x ;
+  Output 2 ;
+  Begin
+     Var x1 , x2 .
+     x : 2 + 3 % y ;
+  End
+  Loop [ x + 2 <= y + [ 2 - 3] + ( y )  ]
+  Begin
+    Loop [ x == ( [ x ] ) ]
+    Begin
+      Var x2 .
+      Output 1 ;
+    End
+End
 End
