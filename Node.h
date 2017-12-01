@@ -39,18 +39,18 @@ enum nodeIdentifier{
 };
 
 class Node {
-private:
+
+public:
     nodeIdentifier id;
     struct token token;
     Node* children[4];
-
-public:
     Node(nodeIdentifier id, struct token token);
     Node(nodeIdentifier id);
     ~Node();
     void insertChild(Node* node);
 
     bool hasChildren();
+    void traversePreOrder();
 };
 
 

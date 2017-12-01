@@ -7,6 +7,8 @@
 
 
 #include "Node.h"
+#include <string>
+#include <stack>
 
 class Assembler {
 
@@ -19,7 +21,13 @@ public:
     void assemble();
 
 private:
+    std::stack<token> varStack;
     void program();
+    void declaration(Node* node);
+    void block(Node* node);
+    void expr(Node* node);
+
+    int getStackLocation(std::string ident);
 };
 
 

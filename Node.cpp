@@ -63,6 +63,20 @@ void Node::insertChild(Node* node) {
     }
 }
 
+void Node::traversePreOrder(){
+    static int level = 0;
+    printf("%*c%d:%-9s ", level * 2,' ', level, nodeNames[this->id]); // assume some info printed as string
+    if (this->token.id != BLANK_tkn )printf("%s: %s", token_names[this->token.id], (this->token.value));
+    printf("\n");
+    level++;
+    for (int i = 0; i < 4; i++){
+        if (this->children[i] != nullptr){
+            this->children[i]->traversePreOrder();
+            level--;
+        }
+    }
+}
+
 bool Node::hasChildren() {
     return this->children[0] != nullptr;
 }
