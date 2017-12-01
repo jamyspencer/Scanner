@@ -34,9 +34,9 @@ Node* Parser::block(){
 
 
 Node* Parser::in() {
-    Node* in = new Node(inNode);
     currentToken = scanner.getToken();
-    in->insertChild(new Node(identNode, currentToken));
+    if (currentToken.id != IDENT_tkn) error("identifier");
+    Node* in = new Node(inNode, currentToken);
     currentToken = scanner.getToken();
     if (currentToken.id != SEMICOLON_tkn) error(";");
     currentToken = scanner.getToken();
@@ -44,9 +44,9 @@ Node* Parser::in() {
 }
 
 Node* Parser::out() {
-    Node* out = new Node(outNode);
     currentToken = scanner.getToken();
-    out->insertChild(expr());
+    Node* out = new Node(outNode, currentToken);
+    currentToken = scanner.getToken();
     if (currentToken.id != SEMICOLON_tkn) error(";");
     currentToken = scanner.getToken();
     return out;
@@ -81,8 +81,8 @@ Node* Parser::loop() {
 }
 
 Node* Parser::assign() {
-    Node* assignment = new Node(assignNode);
-    assignment->insertChild(new Node(identNode, currentToken));
+
+    Node* assignment = new Node(assignNode, currentToken);
     currentToken = scanner.getToken();
     if (currentToken.id != COLON_tkn) error(":");
     currentToken = scanner.getToken();
@@ -154,13 +154,11 @@ Node* Parser::R() {
         currentToken = scanner.getToken();
     }
     else if (currentToken.id == IDENT_tkn) {
-        temp = new Node(RNode);
-        temp->insertChild(new Node(identNode, currentToken));
+        temp = new Node(RNode, currentToken);
         currentToken = scanner.getToken();
     }
     else if (currentToken.id == NUM_tkn) {
-        temp = new Node(RNode);
-        temp->insertChild(new Node(number, currentToken));
+        temp = new Node(RNode, currentToken);
         currentToken = scanner.getToken();
     }else{
         error("[ or identifier or number");
