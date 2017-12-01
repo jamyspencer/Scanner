@@ -2,6 +2,7 @@
 #include <malloc.h>
 #include <cstring>
 #include "Parser.h"
+#include "Assembler.h"
 
 
 int main(int argc, char* argv[]){
@@ -10,7 +11,7 @@ int main(int argc, char* argv[]){
     FILE* info_file;
     const char* mode = "r";
     char* file_name = nullptr;
-    Node* parseTree = nullptr;
+    Node* treeRoot = nullptr;
 
     if (argc == 2){ //1 parameter given
         file_name = (char*) malloc (sizeof(char) * (strlen(argv[1]) + 5));
@@ -33,9 +34,9 @@ int main(int argc, char* argv[]){
         return(1);
     }
     Parser parser = Parser(info_file);
-    parseTree = parser.parse();
+    treeRoot = parser.parse();
 
+    Assembler assembler = Assembler(treeRoot);
 
-    parseTree->traversePreOrder();
     return 0;
 }

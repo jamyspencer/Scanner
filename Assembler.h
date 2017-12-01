@@ -6,9 +6,20 @@
 #define FRONTEND_ASSEMBLER_H
 
 
+#include "Node.h"
+
 class Assembler {
+
+    Node* root;
+
 public:
-    Assembler();
+
+    Assembler(Node *root);
+
+    void assemble();
+
+private:
+    void program();
 };
 
 

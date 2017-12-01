@@ -4,4 +4,9 @@
 
 #include "Assembler.h"
 
-Assembler::Assembler() {}
+Assembler::Assembler(Node *root) : root(root) {}
+
+void Assembler::assemble() {
+
+
+}

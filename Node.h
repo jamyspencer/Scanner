@@ -50,7 +50,6 @@ public:
     ~Node();
     void insertChild(Node* node);
 
-    void traversePreOrder();
     bool hasChildren();
 };
 
