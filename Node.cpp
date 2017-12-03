@@ -16,7 +16,7 @@ static const char* nodeNames[] = {
         "mStat",
         "stat",
         "in",
-        "out",
+        "outFile",
         "check",
         "loop",
         "assign",
@@ -29,12 +29,7 @@ static const char* nodeNames[] = {
         "greater",
         "greater_equals",
         "not_equals",
-        "equals_equals",
-        "plus",
-        "minus",
-        "percent",
-        "times",
-        "number"
+        "equals_equals"
 };
 
 Node::Node(nodeIdentifier id, struct token token) : id(id), token(token) {
@@ -58,8 +53,31 @@ void Node::insertChild(Node* node) {
     for (int i = 0; i < 4; i++){
         if (children[i] == nullptr){
             children[i] = node;
+            if (node != nullptr) node->parent = this;
             break;
         }
+    }
+}
+
+void Node::reduceTree(int siblingIndex){
+
+    if (children[0] == nullptr) return;
+    for (int i = 0; i < 4; i++){
+        if (children[i] != nullptr){
+            children[i]->reduceTree(i);
+        }
+    }
+    switch (id) {
+        case MNode:
+        case FNode:
+        case RNode:
+        case exprNode:
+            if (this->token.id == BLANK_tkn && this->children[1] == nullptr) {
+                parent->children[siblingIndex] = children[0];
+                children[0] = nullptr;
+                delete this;
+            }
+            break;
     }
 }
 

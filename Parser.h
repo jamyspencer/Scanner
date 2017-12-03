@@ -34,7 +34,7 @@ private:
     Node* M();
     Node* R();
     Node* F();
-    Node* RO();
+    token RO();
 };
 
 #endif
@@ -49,9 +49,9 @@ private:
 //<R>              ->      [ <expr> ] | Identifier | Number
 //<stats>         ->      <stat>  <mStat>
 //<mStat>       ->      empty |  <stat>  <mStat>
-//<stat>           ->      <in> | <out> | <block> | <if> | <loop> | <assign>
+//<stat>           ->      <in> | <outFile> | <block> | <if> | <loop> | <assign>
 //<in>              ->      Input Identifier ;
-//<out>            ->      Output <expr>  ;
+//<outFile>            ->      Output <expr>  ;
 //<if>               ->      Check [ <expr> <RO> <expr> ] <stat>
 //<loop>          ->      Loop [ <expr> <RO> <expr> ] <stat>
 //<assign>       ->      Identifier : <expr>   ;

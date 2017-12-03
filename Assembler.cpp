@@ -2,39 +2,261 @@
 // Created by jamy on 11/27/17.
 //
 
+
+#include <cstdlib>
 #include "Assembler.h"
 
-Assembler::Assembler(Node *root) : root(root) {}
 
-void Assembler::assemble() {
-    program();
-
-}
-
-void Assembler::program() {
-    Node* node = this->root->children[0];
-    if (node->id == declarationNode){
-        declaration(node);
+void Assembler::assemble(Node* root) {
+    if (root->children[0]->id == declarationNode){
+        declaration(root->children[0]);
+        block(root->children[1]);
     }
-    block(node);
+    else { block(root->children[0]); }
+    fprintf(outFile, "\nSTOP\n");
+    fprintf(outFile, "ZTEMP0 0");
 }
 
-void Assembler::declaration(Node* node) {
-    varStack.push(node->token);
+int Assembler::declaration(Node* node) {
+    varStack.push_back(node->token);
+    fprintf(outFile, "PUSH\n");
     if (node->children[0] != nullptr){
-        declaration(node->children[0]);
+        return 1 + declaration(node->children[0]);
     }
+    return 1;
 }
+
+Assembler::Assembler() {}
 
 void Assembler::block(Node* node) {
-    Node* child = this->root->children[0];
-    if (node->id == declarationNode){
-        declaration(node);
-    }
-    for (int i = 1; i < 4; i++ ){
-        Node* child = this->root->children[i];
+    int varsQuan;
+    for (int i = 0; i < 4; i++ ){
+        Node* child = node->children[i];
         if (child == nullptr) break;
-        
+        switch (child->id){
+            case declarationNode: varsQuan = declaration(child); break;
+            case statNode: stat(child); break;
+        }
     }
+    for (int i = 0; i < varsQuan; i++){
+        varStack.pop_back();
+        fprintf(outFile, "POP\n");
+    }
+}
 
+void Assembler::expr(Node *node) {
+    Node* child = node->children[1];
+    if (child == nullptr) {
+        child = node->children[0];
+        M(child);
+    }else{
+        if (child->id == exprNode) expr(child);
+        else R(child);
+        child = node->children[0];
+        switch (child->token.id) {
+            case IDENT_tkn:
+                fprintf(outFile, "STORE ZTEMP0\n");
+                fprintf(outFile, "STACKR %d\n", getStackLocation(std::string(child->token.value)));
+                if(node->token.id == MINUS_tkn) fprintf(outFile, "SUB ZTEMP0\n");
+                else fprintf(outFile, "ADD ZTEMP0\n");
+                break;
+            case NUM_tkn:
+                fprintf(outFile, "ADD %s\n", child->token.value);
+                if(node->token.id == MINUS_tkn) fprintf(outFile, "MULT -1\n");
+                break;
+        }
+    }
+}
+
+void Assembler::M(Node* node) { //returns stack location of stored value
+    Node* child = node->children[1];
+    if (child->id == exprNode) expr(child);
+    else {
+        if (child->token.id == NUM_tkn) {
+            fprintf(outFile, "LOAD %s\n", child->token.value);
+        } else if (child->token.id = IDENT_tkn){
+            int stackLocation = getStackLocation(std::string(child->token.value));
+            fprintf(outFile, "STACKR %d\n", stackLocation);
+        }else expr(child);
+    }
+    switch (node->token.id){
+        case PERCENT_tkn: fprintf(outFile, "PERCENT "); break;
+        case TIMES_tkn: fprintf(outFile, "MULT "); break;
+    }
+    child = node->children[0];
+    switch (child->token.id) {
+        case IDENT_tkn:
+            getStackLocation(std::string(child->token.value));
+            break;
+        case NUM_tkn:
+            fprintf(outFile, "%s\n", child->token.value);
+            break;
+    }
+}
+
+
+int Assembler::getStackLocation(std::string ident) {
+    int i = -1;
+    for (std::vector<token>::iterator it = varStack.end() ; it >= varStack.begin(); it--){
+        if (std::string((*it).value) == ident) return i;
+        i++;
+    }
+    printf("ERROR: \"%s\" not declared or outFile of scope\n", ident.c_str());
+    exit(-1);
+}
+
+void Assembler::assign(Node *node) {
+    Node* child = node->children[0];
+    switch (child->id){
+        case MNode: M(child); break;
+        case assignNode: expr(child); break;
+        case RNode: R(child);
+    }
+    int stackLocation = getStackLocation(std::string(node->token.value));
+    fprintf(outFile, "STACKW %d\n", stackLocation);
+}
+
+Assembler::~Assembler() {
+    fclose(outFile);
+}
+
+void Assembler::stat(Node *node) {
+
+    Node* child;
+    for (int i = 0; i < 4; i++){
+        child = node->children[i];
+        if (child == nullptr) break;
+        switch (child->id){
+            case assignNode: assign(child); break;
+            case loopNode: loop(child); break;
+            case checkNode: check(child); break;
+            case blockNode: block(child); break;
+            case outNode: out(child); break;
+            case statNode: stat(child); break;
+            case inNode: in(child); break;
+            case mStatNode: mStat(child); break;
+        }
+    }
+}
+
+void Assembler::R(Node *node) {
+    switch (node->token.id) {
+        case NUM_tkn:
+            fprintf(outFile, "LOAD %s\n", node->token.value);
+            break;
+        case IDENT_tkn:
+            int stackLocation = getStackLocation(std::string(node->token.value));
+            fprintf(outFile, "STACKR %d\n", stackLocation);
+    }
+}
+
+void Assembler::out(Node *node) {
+    Node* child = node->children[0];
+    switch (child->id){
+        case RNode:
+            R(child);
+            fprintf(outFile, "STORE ZTEMP0\n");
+            fprintf(outFile, "WRITE ZTEMP0\n");
+            break;
+    }
+}
+
+void Assembler::in(Node *node) {
+    int stackLocation = getStackLocation(std::string(node->token.value));
+    fprintf(outFile, "READ ZTEMP0\n");
+    fprintf(outFile, "STACKW %d\n", stackLocation);
+}
+
+void Assembler::check(Node *node) {
+    std::string tempVar = tempVarGen();
+    std::string jumpLabel = checkLabelGen();
+    fprintf(outFile, "\n");
+    //process righthand side
+    switch(node->children[1]->id){
+        case RNode: R(node->children[1]); break;
+        case exprNode: expr(node->children[1]); break;
+    }
+    //store righthand side in temp var
+    fprintf(outFile, "STORE %s\n", tempVar.c_str());
+
+    //process lefthand side
+    switch(node->children[0]->id){
+        case RNode: R(node->children[0]); break;
+        case exprNode: expr(node->children[0]); break;
+    }
+    //subtract righthand value from lefthand side
+    fprintf(outFile, "SUB %s\n", tempVar.c_str());//store righthand side in temp var
+    switch (node->token.id){
+        case EQUALS_EQUALS_tkn:
+            fprintf(outFile, "BRPOS %s\nBRNEG %s\n", jumpLabel.c_str(), jumpLabel.c_str());
+            break;
+        case NOT_EQUALS_tkn:
+            fprintf(outFile, "BRZERO %s\n", jumpLabel.c_str());
+            break;
+        case GREATER_tkn:
+            fprintf(outFile, "BRZNEG %s\n", jumpLabel.c_str());
+            break;
+        case GREATER_EQUALS_tkn:
+            fprintf(outFile, "BRNEG %s\n", jumpLabel.c_str());
+            break;
+        case LESS_tkn:
+            fprintf(outFile, "BRZPOS %s\n", jumpLabel.c_str());
+            break;
+        case LESS_EQUALS_tkn:
+            fprintf(outFile, "BRPOS %s\n", jumpLabel.c_str());
+            break;
+    }
+    //process statement
+    stat(node->children[2]);
+
+    //tag to jump to on evaluation to false
+    fprintf(outFile, "\n%s: NOOP\n", jumpLabel.c_str());
+    freeTempVar(tempVar);
+}
+
+void Assembler::loop(Node *node) {
+
+}
+
+void Assembler::mStat(Node *node) {
+    stat(node->children[0]);
+    if (node->children[1] != nullptr){
+        mStat(node->children[1]);
+    }
+}
+
+std::string Assembler::tempVarGen() {
+    int i = 1;
+    while(true){
+        if (numbersUsed.find(i) == numbersUsed.end()) break;
+        i++;
+    }
+    numbersUsed.emplace(i);
+    allNumbersUsed.emplace(i);
+    char buffer[20];
+    sprintf(buffer, "ZTEMP%d", i);
+    return std::string(buffer);
+}
+
+void Assembler::freeTempVar(std::string tempVar){
+    std::string numString = tempVar.substr(5);
+    int val;
+    sscanf(numString.c_str(), "%d", &val);
+    numbersUsed.erase(numbersUsed.find(val));
+}
+
+std::string Assembler::checkLabelGen() {
+    static int count = -1;
+    count++;
+    char buffer[20];
+    sprintf(buffer, "SKIP%d", count);
+    return buffer;
+}
+
+std::string Assembler::loopLabelGen() {
+    static int count = -1;
+    count++;
+    char buffer[20];
+    sprintf(buffer, "LOOP%d", count);
+    return buffer;
 }

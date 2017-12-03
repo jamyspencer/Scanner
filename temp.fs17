@@ -1,17 +1,11 @@
 Var x , y .
 Begin
-  Input x ;
-  Output 2 ;
-  Begin
-     Var x1 , x2 .
-     x : 2 + 3 % y ;
-  End
-  Loop [ x + 2 <= y + [ 2 - 3] + ( y )  ]
-  Begin
-    Loop [ x == ( [ x ] ) ]
+    Var z.
+    y: 3 * [z - 2];
     Begin
-      Var x2 .
-      Output 1 ;
+        z: 5;
+        Check [x - y + 5 <= 2] Output x;
     End
 End
+
 End

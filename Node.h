@@ -30,12 +30,7 @@ enum nodeIdentifier{
     greater,
     greater_equals,
     not_equals,
-    equals_equals,
-    plus,
-    minus,
-    percent,
-    times,
-    number
+    equals_equals
 };
 
 class Node {
@@ -43,6 +38,7 @@ class Node {
 public:
     nodeIdentifier id;
     struct token token;
+    Node* parent;
     Node* children[4];
     Node(nodeIdentifier id, struct token token);
     Node(nodeIdentifier id);
@@ -50,6 +46,7 @@ public:
     void insertChild(Node* node);
 
     bool hasChildren();
+    void reduceTree(int);
     void traversePreOrder();
 };
 

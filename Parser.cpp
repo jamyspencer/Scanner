@@ -45,20 +45,20 @@ Node* Parser::in() {
 
 Node* Parser::out() {
     currentToken = scanner.getToken();
-    Node* out = new Node(outNode, currentToken);
-    currentToken = scanner.getToken();
+    Node* out = new Node(outNode);
+    out->insertChild(expr());
     if (currentToken.id != SEMICOLON_tkn) error(";");
     currentToken = scanner.getToken();
     return out;
 }
 
 Node* Parser::check() {
-    Node* check = new Node(checkNode, currentToken);
+    Node* check = new Node(checkNode);
     currentToken = scanner.getToken();
     if (currentToken.id != LEFT_BRACKET_tkn) error("[");
     currentToken = scanner.getToken();
     check->insertChild(expr());
-    check->insertChild(RO());
+    check->token = RO();
     check->insertChild(expr());
     if (currentToken.id != RIGHT_BRACKET_tkn) error("]");
     currentToken = scanner.getToken();
@@ -72,7 +72,7 @@ Node* Parser::loop() {
     if (currentToken.id != LEFT_BRACKET_tkn) error("[");
     currentToken = scanner.getToken();
     loop->insertChild(expr());
-    loop->insertChild(RO());
+    loop->token = RO();
     loop->insertChild(expr());
     if (currentToken.id != RIGHT_BRACKET_tkn) error("]");
     currentToken = scanner.getToken();
@@ -95,16 +95,12 @@ Node* Parser::assign() {
 Node* Parser::expr() {
     Node* expression = new Node(exprNode);
     expression->insertChild(M());
-    if (currentToken.id == PLUS_tkn) {
-        expression->insertChild(new Node(plus, currentToken));
+    if (currentToken.id == PLUS_tkn || currentToken.id == MINUS_tkn){
+        expression->token = currentToken;
         currentToken = scanner.getToken();
         expression->insertChild(expr());
     }
-    else if (currentToken.id == MINUS_tkn) {
-        expression->insertChild(new Node(minus, currentToken));
-        currentToken = scanner.getToken();
-        expression->insertChild(expr());
-    }
+
     if (expression->hasChildren()) return expression;
     return nullptr;
 }
@@ -112,20 +108,12 @@ Node* Parser::expr() {
 Node* Parser::M() {
     Node* temp = new Node(MNode);
     temp->insertChild(F());
-    if (currentToken.id == PERCENT_tkn){
-        Node* newNode = new Node(MNode);
-        newNode->insertChild(new Node(percent, currentToken));
+    if (currentToken.id == PERCENT_tkn || currentToken.id == TIMES_tkn){
+        temp->token = currentToken;
         currentToken = scanner.getToken();
-        newNode->insertChild(M());
-        temp->insertChild(newNode);
+        temp->insertChild(M());
     }
-    else if (currentToken.id == TIMES_tkn){
-        Node* newNode = new Node(MNode);
-        newNode->insertChild(new Node(times, currentToken));
-        currentToken = scanner.getToken();
-        newNode->insertChild(M());
-        temp->insertChild(newNode);
-    }
+
     if (temp->hasChildren()) return temp;
     return nullptr;
 }
@@ -166,37 +154,22 @@ Node* Parser::R() {
     return temp;
 }
 
-Node* Parser::RO() {
+token Parser::RO() {
+    token temp;
     switch(currentToken.id){
-        Node* temp;
         case LESS_tkn:
-            temp =  new Node(less, currentToken);
-            currentToken = scanner.getToken();
-            return temp;
         case LESS_EQUALS_tkn:
-            temp =  new Node(less_equals, currentToken);
-            currentToken = scanner.getToken();
-            return temp;
         case GREATER_tkn:
-            temp =  new Node(greater, currentToken);
-            currentToken = scanner.getToken();
-            return temp;
         case GREATER_EQUALS_tkn:
-            temp =  new Node(greater_equals, currentToken);
-            currentToken = scanner.getToken();
-            return temp;
         case EQUALS_EQUALS_tkn:
-            temp =  new Node(equals_equals, currentToken);
-            currentToken = scanner.getToken();
-            return temp;
         case NOT_EQUALS_tkn:
-            temp =  new Node(not_equals, currentToken);
+            temp = currentToken;
             currentToken = scanner.getToken();
             return temp;
         default:
             error("'<' or '<=' or '>' or '>=' or '==' or '!='");
     }
-    return nullptr;
+    return token();
 }
 
 Node* Parser::mStat() {
@@ -216,10 +189,9 @@ Node* Parser::mStat() {
 }
 
 Node* Parser::stats() {
-    Node* stats = new Node(statsNode);
-    stats->insertChild(stat());
-    stats->insertChild(mStat());
-    return stats;
+    Node* r_stat = stat();
+    r_stat->insertChild(mStat());
+    return r_stat;
 }
 
 Node* Parser::stat() {

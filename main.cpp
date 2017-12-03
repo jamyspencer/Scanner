@@ -35,9 +35,9 @@ int main(int argc, char* argv[]){
     }
     Parser parser = Parser(info_file);
     treeRoot = parser.parse();
-
+    treeRoot->reduceTree(0);
     treeRoot->traversePreOrder();
-    Assembler assembler = Assembler(treeRoot);
-
+    Assembler assembler = Assembler();
+    assembler.assemble(treeRoot);
     return 0;
 }

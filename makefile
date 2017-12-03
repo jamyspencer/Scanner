@@ -2,7 +2,7 @@ CC = g++
 CFLAGS  = -g -Wall -std=c++11 -fno-inline-functions
 TARGET = testScanner
 
-OBJECTS = main.o Parser.o Scanner.o Node.o States.o token.o StrFunctions.o resolutions.o
+OBJECTS = main.o Parser.o Scanner.o Node.o States.o token.o StrFunctions.o resolutions.o Assembler.o
 
 
 
@@ -10,11 +10,14 @@ $(TARGET):  $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS)
 	rm *.o
 
-main.o: Parser.cpp Parser.h
+main.o: Parser.cpp Parser.h Node.o
 	$(CC) $(CFLAGS) -c main.cpp
 
-Parser.o:  Parser.cpp Parser.h token.o
+Parser.o:  Parser.cpp Parser.h token.o Node.o
 	$(CC) $(CFLAGS) -c Parser.cpp
+	
+Assembler.o:  Assembler.cpp Assembler.h token.o Node.o
+	$(CC) $(CFLAGS) -c Assembler.cpp	
 
 Node.o: Node.cpp Node.h
 	$(CC) $(CFLAGS) -c Node.cpp
