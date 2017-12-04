@@ -20,11 +20,18 @@ public:
     void assemble(Node* root);
 
 private:
+    struct compileVar {
+        int level = 0;
+        char value[10];
+        int line;
+    };
+
+    int currentLevel = 0;
     std::string fileName = "out.asm";
     FILE* outFile = fopen(fileName.c_str(), "w");
     std::set<int> numbersUsed;
     std::set<int> allNumbersUsed;
-    std::vector<token> varStack;
+    std::vector<compileVar> varStack;
     int declaration(Node* node);
     void assign(Node* node);
     void R(Node* node);

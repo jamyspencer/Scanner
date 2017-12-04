@@ -17,8 +17,8 @@ void appendChar(char *destination, char source){
 int equals(const char* word1, const char* word2){
     int i = 0;
     while (true){
-        if (word1[i] != word2[i]) {return 1;}
-        if (word1[i] == '\0' && word2[i] == '\0') { return 0; }
+        if (word1[i] != word2[i]) {return 0;}
+        if (word1[i] == '\0' && word2[i] == '\0') { return 1; }
         i++;
     }
 }

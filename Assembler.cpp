@@ -4,7 +4,9 @@
 
 
 #include <cstdlib>
+#include <cstring>
 #include "Assembler.h"
+#include "StrFunctions.h"
 
 
 void Assembler::assemble(Node* root) {
@@ -18,11 +20,25 @@ void Assembler::assemble(Node* root) {
 }
 
 int Assembler::declaration(Node* node) {
-    varStack.push_back(node->token);
+
+    compileVar var = compileVar();
+    strcpy(var.value, node->token.value);
+    var.line = node->token.line;
+    var.level = currentLevel;
+
+    for (std::vector<compileVar>::iterator it = varStack.begin(); it != varStack.end(); it++){
+        if (it->level == currentLevel && equals(it->value, var.value)) {
+            printf("ERROR: Duplicate variable declaration: %s on line: %d\n", var.value, var.line);
+            exit(1);
+        };
+    }
+
+    varStack.push_back(var);
     fprintf(outFile, "PUSH\n");
     if (node->children[0] != nullptr){
         return 1 + declaration(node->children[0]);
     }
+
     return 1;
 }
 
@@ -30,6 +46,7 @@ Assembler::Assembler() {}
 
 void Assembler::block(Node* node) {
     int varsQuan;
+    currentLevel++;
     for (int i = 0; i < 4; i++ ){
         Node* child = node->children[i];
         if (child == nullptr) break;
@@ -38,6 +55,7 @@ void Assembler::block(Node* node) {
             case statNode: stat(child); break;
         }
     }
+    currentLevel--;
     for (int i = 0; i < varsQuan; i++){
         varStack.pop_back();
         fprintf(outFile, "POP\n");
@@ -94,16 +112,6 @@ void Assembler::M(Node* node) { //returns stack location of stored value
     }
 }
 
-
-int Assembler::getStackLocation(std::string ident) {
-    int i = -1;
-    for (std::vector<token>::iterator it = varStack.end() ; it >= varStack.begin(); it--){
-        if (std::string((*it).value) == ident) return i;
-        i++;
-    }
-    printf("ERROR: \"%s\" not declared or outFile of scope\n", ident.c_str());
-    exit(-1);
-}
 
 void Assembler::assign(Node *node) {
     Node* child = node->children[0];
@@ -223,6 +231,18 @@ void Assembler::mStat(Node *node) {
     if (node->children[1] != nullptr){
         mStat(node->children[1]);
     }
+}
+
+//Helper functions
+
+int Assembler::getStackLocation(std::string ident) {
+    int i = -1;
+    for (std::vector<compileVar>::iterator it = varStack.end() ; it >= varStack.begin(); it--){
+        if (std::string((*it).value) == ident) return i;
+        i++;
+    }
+    printf("ERROR: \"%s\" not declared or outFile of scope\n", ident.c_str());
+    exit(-1);
 }
 
 std::string Assembler::tempVarGen() {
