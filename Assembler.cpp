@@ -88,28 +88,32 @@ void Assembler::expr(Node *node) {
 
 void Assembler::M(Node* node) { //returns stack location of stored value
     Node* child = node->children[1];
+    int stackLocation;
     if (child->id == exprNode) expr(child);
     else {
         if (child->token.id == NUM_tkn) {
             fprintf(outFile, "LOAD %s\n", child->token.value);
         } else if (child->token.id = IDENT_tkn){
-            int stackLocation = getStackLocation(std::string(child->token.value));
+            stackLocation = getStackLocation(std::string(child->token.value));
             fprintf(outFile, "STACKR %d\n", stackLocation);
         }else expr(child);
     }
-    switch (node->token.id){
-        case PERCENT_tkn: fprintf(outFile, "PERCENT "); break;
-        case TIMES_tkn: fprintf(outFile, "MULT "); break;
-    }
+    fprintf(outFile, "STORE ZTEMP0\n");
     child = node->children[0];
     switch (child->token.id) {
         case IDENT_tkn:
-            getStackLocation(std::string(child->token.value));
+            stackLocation = getStackLocation(std::string(child->token.value));
+            fprintf(outFile, "STACKR %d\n", stackLocation);
             break;
         case NUM_tkn:
-            fprintf(outFile, "%s\n", child->token.value);
+            fprintf(outFile, "LOAD %s\n", child->token.value);
             break;
     }
+    switch (node->token.id){
+        case PERCENT_tkn: fprintf(outFile, "DIV ZTEMP0\n"); break;
+        case TIMES_tkn: fprintf(outFile, "MULT ZTEMP0\n"); break;
+    }
+
 }
 
 
@@ -193,7 +197,7 @@ void Assembler::check(Node *node) {
         case exprNode: expr(node->children[0]); break;
     }
     //subtract righthand value from lefthand side
-    fprintf(outFile, "SUB %s\n", tempVar.c_str());//store righthand side in temp var
+    fprintf(outFile, "SUB %s\n", tempVar.c_str());
     switch (node->token.id){
         case EQUALS_EQUALS_tkn:
             fprintf(outFile, "BRPOS %s\nBRNEG %s\n", jumpLabel.c_str(), jumpLabel.c_str());
@@ -223,7 +227,50 @@ void Assembler::check(Node *node) {
 }
 
 void Assembler::loop(Node *node) {
+    int loopNum = getLoopNum();
+    std::string tempVar = tempVarGen();
+    fprintf(outFile, "\nLOOPSTART%d\n", loopNum);
+    //process righthand side
+    switch(node->children[1]->id){
+        case RNode: R(node->children[1]); break;
+        case exprNode: expr(node->children[1]); break;
+    }
+    //store righthand side in temp var
+    fprintf(outFile, "STORE %s\n", tempVar.c_str());
 
+    //process lefthand side
+    switch(node->children[0]->id){
+        case RNode: R(node->children[0]); break;
+        case exprNode: expr(node->children[0]); break;
+    }
+    //subtract righthand value from lefthand side
+    fprintf(outFile, "SUB %s\n", tempVar.c_str());
+    //value in accumulator is logical result
+    switch (node->token.id){
+        case EQUALS_EQUALS_tkn:
+            fprintf(outFile, "BRPOS LOOPSTOP%d\nLOOPSTOP%d\n", loopNum, loopNum);
+            break;
+        case NOT_EQUALS_tkn:
+            fprintf(outFile, "BRZERO LOOPSTOP%d\n", loopNum);
+            break;
+        case GREATER_tkn:
+            fprintf(outFile, "BRZNEG LOOPSTOP%d\n", loopNum);
+            break;
+        case GREATER_EQUALS_tkn:
+            fprintf(outFile, "BRNEG LOOPSTOP%d\n", loopNum);
+            break;
+        case LESS_tkn:
+            fprintf(outFile, "BRZPOS LOOPSTOP%d\n", loopNum);
+            break;
+        case LESS_EQUALS_tkn:
+            fprintf(outFile, "BRPOS LOOPSTOP%d\n", loopNum);
+            break;
+    }
+    //process statement
+    stat(node->children[2]);
+    //jump to beginning of Loop to test conditions
+    fprintf(outFile, "BR LOOPSTART%d\n", loopNum);
+    fprintf(outFile, "LOOPSTOP%d: NOOP\n", loopNum);
 }
 
 void Assembler::mStat(Node *node) {
@@ -241,7 +288,7 @@ int Assembler::getStackLocation(std::string ident) {
         if (std::string((*it).value) == ident) return i;
         i++;
     }
-    printf("ERROR: \"%s\" not declared or outFile of scope\n", ident.c_str());
+    printf("ERROR: \"%s\" not declared or out of scope\n", ident.c_str());
     exit(-1);
 }
 
@@ -266,17 +313,15 @@ void Assembler::freeTempVar(std::string tempVar){
 }
 
 std::string Assembler::checkLabelGen() {
-    static int count = -1;
-    count++;
+    static int checkCount = -1;
+    checkCount++;
     char buffer[20];
-    sprintf(buffer, "SKIP%d", count);
+    sprintf(buffer, "SKIP%d", checkCount);
     return buffer;
 }
 
-std::string Assembler::loopLabelGen() {
-    static int count = -1;
-    count++;
-    char buffer[20];
-    sprintf(buffer, "LOOP%d", count);
-    return buffer;
+int Assembler::getLoopNum() {
+    static int loopCount = -1;
+    loopCount++;
+    return loopCount;
 }

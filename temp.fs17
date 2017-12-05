@@ -1,11 +1,10 @@
 Var x , y .
 Begin
-    Var z.
-    y: 3 * [z - 2];
-    Begin
-        z: 5;
-        Check [x - y + 5 <= 2] Output x;
-    End
-End
-
+  Input x ;
+  Loop [ x >= 0 ]
+  Begin
+     Check [ x >= 5 ]
+        Output x ;
+     x : x - 1 ;
+  End
 End

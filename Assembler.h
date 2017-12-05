@@ -49,7 +49,7 @@ private:
     std::string tempVarGen();
     void freeTempVar(std::string tempVar);
     std::string checkLabelGen();
-    std::string loopLabelGen();
+    int getLoopNum();
 };
 
 
@@ -81,9 +81,4 @@ as the arg: immediate value is positive integer or negative integer
 - POP (0, tos--)
 - STACKW (1,stack[tos-arg]=ACC)
 - STACKR (1,ACC=stack[tos-arg])
-
-PUSH/POP are only means to reserve/delete automatic storage.
-STACKW/STACKR n - these are stack write/read instructions.
-n must be a non-negative number, and the access is to nth element down from TOS
-NOTE: TOS points to the topmost element on the stack
- */
+*/
