@@ -1,5 +1,6 @@
 Var x , y .
 Begin
+Var z.
   Input x ;
   Loop [ x >= 0 ]
   Begin

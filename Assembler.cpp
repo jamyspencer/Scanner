@@ -49,7 +49,7 @@ int Assembler::declaration(Node* node) {
 Assembler::Assembler() {}
 
 void Assembler::block(Node* node) {
-    int varsQuan;
+    int varsQuan = 0;
     currentLevel++;
     for (int i = 0; i < 4; i++ ){
         Node* child = node->children[i];
