@@ -27,7 +27,7 @@ int main(int argc, char* argv[]){
     else if (argc == 1){//no parameters given
         info_file = stdin;
         file_name = (char*) malloc (sizeof(char) * 9);
-        strcpy(file_name, "keyboard");
+        strcpy(file_name, "out");
     }
     else {//exit with error message
         printf("You must include either 1 or 0 arguements.\n");
@@ -37,7 +37,8 @@ int main(int argc, char* argv[]){
     treeRoot = parser.parse();
     treeRoot->reduceTree(0);
     treeRoot->traversePreOrder();
-    Assembler assembler = Assembler();
+    std::string outFileName = std::string(argv[1])+ ".asm";
+    Assembler assembler = Assembler(outFileName);
     assembler.assemble(treeRoot);
     return 0;
 }

@@ -15,7 +15,8 @@ class Assembler {
 
 public:
 
-    Assembler();
+    Assembler(const std::string &fileName);
+
     ~Assembler();
     void assemble(Node* root);
 
@@ -27,7 +28,7 @@ private:
     };
 
     int currentLevel = 0;
-    std::string fileName = "out.asm";
+    std::string fileName;
     FILE* outFile = fopen(fileName.c_str(), "w");
     std::set<int> numbersUsed;
     std::set<int> allNumbersUsed;
@@ -36,6 +37,7 @@ private:
     void assign(Node* node);
     void R(Node* node);
     void M(Node* node);
+    void F(Node* node);
     void block(Node* node);
     void expr(Node* node);
     void stat(Node* node);

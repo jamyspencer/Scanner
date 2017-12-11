@@ -46,8 +46,6 @@ int Assembler::declaration(Node* node) {
     return 1;
 }
 
-Assembler::Assembler() {}
-
 void Assembler::block(Node* node) {
     int varsQuan = 0;
     currentLevel++;
@@ -70,49 +68,45 @@ void Assembler::expr(Node *node) {
     Node* child = node->children[1];
     if (child == nullptr) {
         child = node->children[0];
-        M(child);
+        if (child->id == MNode) M(child);
+        if (child->id == RNode) R(child);
+        if (child->id == FNode) F(child);
     }else{
         if (child->id == exprNode) expr(child);
+        else if (child->id == MNode) M(child);
+        else if (child->id == FNode) F(child);
         else R(child);
+        fprintf(outFile, "STORE ZTEMP0 \n");
         child = node->children[0];
-        switch (child->token.id) {
-            case IDENT_tkn:
-                fprintf(outFile, "STORE ZTEMP0\n");
-                fprintf(outFile, "STACKR %d\n", getStackLocation(std::string(child->token.value)));
-                if(node->token.id == MINUS_tkn) fprintf(outFile, "SUB ZTEMP0\n");
-                else fprintf(outFile, "ADD ZTEMP0\n");
-                break;
-            case NUM_tkn:
-                fprintf(outFile, "ADD %s\n", child->token.value);
-                if(node->token.id == MINUS_tkn) fprintf(outFile, "MULT -1\n");
-                break;
+        if (child->id == exprNode) expr(child);
+        else if (child->id == MNode) M(child);
+        else if (child->id == FNode) F(child);
+        else R(child);
+        if (node->token.id == PLUS_tkn){
+            fprintf(outFile, "ADD ZTEMP0\n");
+        }else{
+            fprintf(outFile, "SUB ZTEMP0\n");
         }
+
     }
 }
 
 void Assembler::M(Node* node) { //returns stack location of stored value
     Node* child = node->children[1];
     int stackLocation;
-    if (child->id == exprNode) expr(child);
-    else {
-        if (child->token.id == NUM_tkn) {
-            fprintf(outFile, "LOAD %s\n", child->token.value);
-        } else if (child->token.id = IDENT_tkn){
-            stackLocation = getStackLocation(std::string(child->token.value));
-            fprintf(outFile, "STACKR %d\n", stackLocation);
-        }else expr(child);
+    if (child != nullptr){
+        if (child->id == exprNode) expr(child);
+        else if (child->id == MNode) M(child);
+        else if (child->id == RNode) R(child);
+        else if (child->id == FNode) F(child);
+
+        fprintf(outFile, "STORE ZTEMP0\n");
     }
-    fprintf(outFile, "STORE ZTEMP0\n");
     child = node->children[0];
-    switch (child->token.id) {
-        case IDENT_tkn:
-            stackLocation = getStackLocation(std::string(child->token.value));
-            fprintf(outFile, "STACKR %d\n", stackLocation);
-            break;
-        case NUM_tkn:
-            fprintf(outFile, "LOAD %s\n", child->token.value);
-            break;
-    }
+    if (child->id == exprNode) expr(child);
+    else if (child->id == MNode) M(child);
+    else if (child->id == RNode) R(child);
+    else if (child->id == FNode) F(child);
     switch (node->token.id){
         case PERCENT_tkn: fprintf(outFile, "DIV ZTEMP0\n"); break;
         case TIMES_tkn: fprintf(outFile, "MULT ZTEMP0\n"); break;
@@ -125,7 +119,7 @@ void Assembler::assign(Node *node) {
     Node* child = node->children[0];
     switch (child->id){
         case MNode: M(child); break;
-        case assignNode: expr(child); break;
+        case exprNode: expr(child); break;
         case RNode: R(child);
     }
     int stackLocation = getStackLocation(std::string(node->token.value));
@@ -163,23 +157,26 @@ void Assembler::R(Node *node) {
         case IDENT_tkn:
             int stackLocation = getStackLocation(std::string(node->token.value));
             fprintf(outFile, "STACKR %d\n", stackLocation);
+            fprintf(outFile, "STACKW %d\n", stackLocation);
     }
 }
 
 void Assembler::out(Node *node) {
     Node* child = node->children[0];
     switch (child->id){
-        case RNode:
-            R(child);
-            fprintf(outFile, "STORE ZTEMP0\n");
-            fprintf(outFile, "WRITE ZTEMP0\n");
-            break;
+        case RNode: R(child); break;
+        case MNode: M(child); break;
+        case FNode: F(child); break;
+        case exprNode: expr(child); break;
     }
+    fprintf(outFile, "STORE ZTEMP0\n");
+    fprintf(outFile, "WRITE ZTEMP0\n");
 }
 
 void Assembler::in(Node *node) {
     int stackLocation = getStackLocation(std::string(node->token.value));
     fprintf(outFile, "READ ZTEMP0\n");
+    fprintf(outFile, "LOAD ZTEMP0\n");
     fprintf(outFile, "STACKW %d\n", stackLocation);
 }
 
@@ -191,6 +188,8 @@ void Assembler::check(Node *node) {
     switch(node->children[1]->id){
         case RNode: R(node->children[1]); break;
         case exprNode: expr(node->children[1]); break;
+        case FNode: F(node->children[1]); break;
+        case MNode: M(node->children[1]); break;
     }
     //store righthand side in temp var
     fprintf(outFile, "STORE %s\n", tempVar.c_str());
@@ -199,6 +198,8 @@ void Assembler::check(Node *node) {
     switch(node->children[0]->id){
         case RNode: R(node->children[0]); break;
         case exprNode: expr(node->children[0]); break;
+        case FNode: F(node->children[0]); break;
+        case MNode: M(node->children[0]); break;
     }
     //subtract righthand value from lefthand side
     fprintf(outFile, "SUB %s\n", tempVar.c_str());
@@ -233,10 +234,11 @@ void Assembler::check(Node *node) {
 void Assembler::loop(Node *node) {
     int loopNum = getLoopNum();
     std::string tempVar = tempVarGen();
-    fprintf(outFile, "\nLOOPSTART%d\n", loopNum);
+    fprintf(outFile, "\nLOOPSTART%d: NOOP\n", loopNum);
     //process righthand side
     switch(node->children[1]->id){
         case RNode: R(node->children[1]); break;
+        case FNode: F(node->children[1]); break;
         case exprNode: expr(node->children[1]); break;
     }
     //store righthand side in temp var
@@ -245,6 +247,7 @@ void Assembler::loop(Node *node) {
     //process lefthand side
     switch(node->children[0]->id){
         case RNode: R(node->children[0]); break;
+        case FNode: F(node->children[0]); break;
         case exprNode: expr(node->children[0]); break;
     }
     //subtract righthand value from lefthand side
@@ -287,10 +290,10 @@ void Assembler::mStat(Node *node) {
 //Helper functions
 
 int Assembler::getStackLocation(std::string ident) {
-    int i = -1;
-    for (std::vector<compileVar>::iterator it = varStack.end() ; it >= varStack.begin(); it--){
-        if (std::string((*it).value) == ident) return i;
-        i++;
+    int val = 0;
+    for (int i = varStack.size() - 1; i >= 0; i-- ){
+        if (std::string(varStack[i].value) == ident) return val;
+        val++;
     }
     printf("ERROR: \"%s\" not declared or out of scope\n", ident.c_str());
     exit(-1);
@@ -329,3 +332,18 @@ int Assembler::getLoopNum() {
     loopCount++;
     return loopCount;
 }
+
+void Assembler::F(Node *node) {
+    Node* child = node->children[0];
+    if (child->id == FNode){
+        F(child);
+        fprintf(outFile, "MULT -1\n");
+    }else{
+        if (child->id == exprNode) expr(child);
+        else if (child->id == MNode) M(child);
+        else if (child->id == RNode) R(child);
+        else if (child->id == FNode) F(child);
+    }
+}
+
+Assembler::Assembler(const std::string &fileName) : fileName(fileName) {}

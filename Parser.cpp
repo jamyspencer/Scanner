@@ -122,7 +122,7 @@ Node* Parser::F() {
     Node* temp = new Node(FNode);
     if (currentToken.id == LEFT_PAREN_tkn){
         currentToken = scanner.getToken();
-        F();
+        temp->insertChild(F());
         if (currentToken.id != RIGHT_PAREN_tkn) error(")");
         currentToken = scanner.getToken();
     }else{

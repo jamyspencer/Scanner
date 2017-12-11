@@ -69,7 +69,6 @@ void Node::reduceTree(int siblingIndex){
     }
     switch (id) {
         case MNode:
-        case FNode:
         case RNode:
         case exprNode:
             if (this->token.id == BLANK_tkn && this->children[1] == nullptr) {
