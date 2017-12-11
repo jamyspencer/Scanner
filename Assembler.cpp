@@ -16,7 +16,11 @@ void Assembler::assemble(Node* root) {
     }
     else { block(root->children[0]); }
     fprintf(outFile, "\nSTOP\n");
-    fprintf(outFile, "ZTEMP0 0");
+    fprintf(outFile, "ZTEMP0 0\n");
+    for (std::set<int>::iterator it = allNumbersUsed.begin(); it != allNumbersUsed.end(); it++){
+        fprintf(outFile, "ZTEMP%d 0\n", *it);
+    }
+
 }
 
 int Assembler::declaration(Node* node) {
